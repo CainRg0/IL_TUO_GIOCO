@@ -11,13 +11,14 @@ class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setScale(1);
 
-        // Filosofi e scienziati con posizioni aggiornate
+        // Filosofi con posizioni aggiornate
         this.philosophers = this.physics.add.staticGroup();
         this.philosophers.create(150, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
         this.philosophers.create(700, 500, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
         this.philosophers.create(650, 150, 'diogene').setScale(0.2).setName('diogene').refreshBody();
         this.philosophers.create(100, 500, 'socrate').setScale(0.2).setName('socrate').refreshBody();
-        this.philosophers.create(400, 300, 'galileo').setScale(0.2).setName('galileo').refreshBody();
+        // MODIFICATO: Sostituito Galileo con Pitagora
+        this.philosophers.create(400, 300, 'pitagora').setScale(0.2).setName('pitagora').refreshBody();
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
