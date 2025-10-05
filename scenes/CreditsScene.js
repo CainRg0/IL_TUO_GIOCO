@@ -36,7 +36,7 @@ class CreditsScene extends Phaser.Scene {
             '',
             '',
             '',
-            'Hanno partecipato al gruppo:',
+            'Hanno partecipato al corso:',
             '',
             'Panico Christian',
             'Valerio D\'Alconzo',
@@ -76,3 +76,4 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
