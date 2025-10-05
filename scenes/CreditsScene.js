@@ -54,24 +54,18 @@ class CreditsScene extends Phaser.Scene {
             'Grazie per aver giocato!',
         ];
 
-        // --- LA MODIFICA DEFINITIVA È QUI ---
-
-        // 1. Creiamo il testo, ma con l'origine (il punto di riferimento) impostata in ALTO al centro.
-        //    E lo posizioniamo con il suo bordo superiore esattamente alla fine dello schermo (y: 600).
         const textObject = this.add.text(400, 600, creditsText, {
             fontSize: '28px',
             fill: '#E0D6B3',
             fontFamily: '"Cinzel", serif',
             align: 'center',
             lineSpacing: 15
-        }).setOrigin(0.5, 0); // Origine: 0.5 sull'asse X (centro), 0 sull'asse Y (CIMA)
+        }).setOrigin(0.5, 0);
 
-        // 2. Animiamo la sua posizione Y (il bordo superiore) fino a farla arrivare a -altezza totale.
-        //    Questo assicura che tutto il testo scorra e scompaia in alto.
         this.tweens.add({
             targets: textObject,
             y: -textObject.height,
-            duration: 30000, 
+            duration: 60000, 
             ease: 'Linear',
             onComplete: () => {
                 this.time.delayedCall(2000, () => {
