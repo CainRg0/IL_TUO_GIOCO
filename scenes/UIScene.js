@@ -93,7 +93,7 @@ class UIScene extends Phaser.Scene {
         const total = this.quizData[this.currentPhilosopher].questions.length;
         let endMessage = `Hai risposto correttamente a ${this.score} su ${total} domande.\n`;
 
-        if (this.score > 1) { // Passa con almeno 2 risposte corrette
+        if (this.score > 1) {
             endMessage += "Hai dimostrato la tua saggezza!";
             this.gameState.completed.push(this.currentPhilosopher);
         } else {
@@ -118,7 +118,6 @@ class UIScene extends Phaser.Scene {
     
     winGame() {
         this.dialogText.setText('CONGRATULAZIONI!\nHai superato le prove di tutti i filosofi!');
-        // Non chiudiamo il dialogo, il gioco è finito.
     }
 
     updateStatusText() {
