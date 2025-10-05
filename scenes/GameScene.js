@@ -11,12 +11,40 @@ class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setScale(1);
 
-        this.philosophers = this.physics.add.staticGroup();
-        this.philosophers.create(150, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
-        this.philosophers.create(700, 500, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
-        this.philosophers.create(650, 150, 'diogene').setScale(0.2).setName('diogene').refreshBody();
-        this.philosophers.create(100, 500, 'socrate').setScale(0.2).setName('socrate').refreshBody();
-        this.philosophers.create(400, 300, 'pitagora').setScale(0.2).setName('pitagora').refreshBody();
+        // --- MODIFICA 1: GRUPPO DINAMICO ---
+        // Il gruppo ora non è più "static" per permettere il movimento.
+        // Aggiungiamo anche delle proprietà di default per i figli del gruppo.
+        this.philosophers = this.physics.add.group({
+            collideWorldBounds: true, // Non escono dallo schermo
+            bounceX: 1, // Rimbalzano leggermente quando si scontrano
+            bounceY: 1
+        });
+
+        // Creiamo i filosofi e impostiamo le loro proprietà fisiche
+        const philosopherData = [
+            { key: 'platone', x: 150, y: 150 },
+            { key: 'aristotele', x: 700, y: 500 },
+            { key: 'diogene', x: 650, y: 150 },
+            { key: 'socrate', x: 100, y: 500 },
+            { key: 'pitagora', x: 400, y: 300 }
+        ];
+
+        philosopherData.forEach(data => {
+            const philosopher = this.philosophers.create(data.x, data.y, data.key)
+                .setScale(0.2)
+                .setName(data.key);
+            
+            // Diamo una "massa" al corpo fisico per collisioni più realistiche
+            philosopher.body.setCircle(philosopher.width / 2 * 0.8); // Hitbox circolare
+            philosopher.setPushable(false); // Il giocatore non li può spingere
+        });
+        
+        // --- MODIFICA 2: REGOLE DELLA FISICA ---
+        // Aggiungiamo una collisione tra il giocatore e i filosofi
+        this.physics.add.collider(this.player, this.philosophers);
+        // Aggiungiamo una collisione tra i filosofi stessi per non farli sovrapporre
+        this.physics.add.collider(this.philosophers, this.philosophers);
+
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -25,46 +53,86 @@ class GameScene extends Phaser.Scene {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
 
-        // --- NUOVA LOGICA PER I PASSI ---
-        // 1. Creiamo l'oggetto audio per i passi, ma non lo avviamo subito.
-        //    Lo impostiamo in loop e a un volume basso.
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
+        this.footstepsSound.play();
+        this.footstepsSound.pause();
+
+        // --- MODIFICA 3: TIMER PER L'IA DEI MOVIMENTI ---
+        // Creiamo un evento a tempo che si ripete ogni 3 secondi (3000 ms)
+        // e che chiama la funzione per muovere i filosofi.
+        this.time.addEvent({
+            delay: 3000,
+            callback: this.movePhilosophers,
+            callbackScope: this,
+            loop: true
+        });
     }
+
+    // --- NUOVA FUNZIONE PER L'IA DEI MOVIMENTI ---
+    movePhilosophers() {
+        // Se c'è un dialogo attivo, non muovere nessuno
+        if (this.dialogActive) {
+            return;
+        }
+
+        const speed = 30; // Una velocità bassa per farli "passeggiare"
+        
+        // Per ogni filosofo nel gruppo...
+        this.philosophers.getChildren().forEach(philosopher => {
+            const randNumber = Phaser.Math.Between(0, 5); // Scegli un numero casuale
+
+            switch (randNumber) {
+                case 0: // Va a Nord
+                    philosopher.setVelocity(0, -speed);
+                    break;
+                case 1: // Va a Est
+                    philosopher.setVelocity(speed, 0);
+                    break;
+                case 2: // Va a Sud
+                    philosopher.setVelocity(0, speed);
+                    break;
+                case 3: // Va a Ovest
+                    philosopher.setVelocity(-speed, 0);
+                    break;
+                default: // Rimane fermo
+                    philosopher.setVelocity(0, 0);
+                    break;
+            }
+        });
+    }
+
 
     update() {
         if (this.dialogActive) {
             this.player.setVelocity(0);
             
-            // Assicuriamoci che i passi si fermino anche se si apre un dialogo
-            if (this.footstepsSound.isPlaying) {
-                this.footstepsSound.stop();
+            // --- MODIFICA 4: FERMIAMO I FILOSOFI QUANDO PARTE UN DIALOGO ---
+            // Usiamo una funzione del gruppo per fermare tutti i suoi membri
+            this.philosophers.setVelocity(0, 0);
+            
+            if (!this.footstepsSound.isPaused) {
+                this.footstepsSound.pause();
             }
             return;
         }
 
-        const speed = 200;
+        const playerSpeed = 200;
         this.player.setVelocity(0);
 
-        if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
-        else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
+        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
         
-        if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
+        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
 
-        // --- LOGICA DI AVVIO/STOP DEI PASSI ---
         const isMoving = this.player.body.velocity.length() > 0;
 
-        // Se il giocatore si sta muovendo E il suono dei passi non è già partito...
-        if (isMoving && !this.footstepsSound.isPlaying) {
-            // ...lo facciamo partire.
-            this.footstepsSound.play();
+        if (isMoving && this.footstepsSound.isPaused) {
+            this.footstepsSound.resume();
         } 
-        // Se invece il giocatore NON si sta muovendo E il suono dei passi è attivo...
-        else if (!isMoving && this.footstepsSound.isPlaying) {
-            // ...lo fermiamo immediatamente.
-            this.footstepsSound.stop();
+        else if (!isMoving && !this.footstepsSound.isPaused) {
+            this.footstepsSound.pause();
         }
-
 
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
