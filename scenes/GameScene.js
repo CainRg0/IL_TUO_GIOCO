@@ -6,13 +6,14 @@ class GameScene extends Phaser.Scene {
     create() {
         // Sfondo
         this.cameras.main.setBackgroundColor('#3d3d3d');
+        this.cameras.main.fadeIn(500, 0, 0, 0);
 
         // Giocatore
         this.player = this.physics.add.sprite(100, 300, 'player');
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(1); // Aggiusta la scala se necessario
+        this.player.setScale(1); // Ora che l'immagine è piccola, la scala è 1
 
-        // Filosofi (come oggetti fisici statici)
+        // Filosofi
         this.philosophers = this.physics.add.staticGroup();
         this.philosophers.create(250, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
         this.philosophers.create(450, 450, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
@@ -22,8 +23,10 @@ class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // Musica
-        this.sound.play('bgm', { loop: true, volume: 0.4 });
+        // Musica (la avviamo qui per assicurarci che il contesto audio sia sbloccato)
+        if (!this.sound.get('bgm')) { // Controlla se sta già suonando
+            this.sound.play('bgm', { loop: true, volume: 0.4 });
+        }
     }
 
     update() {
@@ -59,11 +62,4 @@ class GameScene extends Phaser.Scene {
             this.events.emit('startDialog', canInteractWith.name);
         }
     }
-
 }
-
-
-
-
-
-
