@@ -13,12 +13,12 @@ class GameScene extends Phaser.Scene {
 
         // Filosofi e scienziati
         this.philosophers = this.physics.add.staticGroup();
-        this.philosophers.create(250, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
-        this.philosophers.create(450, 450, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
-        this.philosophers.create(650, 250, 'diogene').setScale(0.2).setName('diogene').refreshBody();
-        // PERSONAGGI AGGIUNTI
-        this.philosophers.create(150, 450, 'socrate').setScale(0.2).setName('socrate').refreshBody();
-        this.philosophers.create(400, 300, 'galileo').setScale(0.2).setName('galileo').refreshBody();
+        // POSIZIONI AGGIORNATE per più spazio
+        this.philosophers.create(150, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
+        this.philosophers.create(700, 500, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
+        this.philosophers.create(650, 150, 'diogene').setScale(0.2).setName('diogene').refreshBody();
+        this.philosophers.create(100, 500, 'socrate').setScale(0.2).setName('socrate').refreshBody();
+        this.philosophers.create(400, 300, 'galileo').setScale(0.2).setName('galileo').refreshBody(); // Galileo resta al centro
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
