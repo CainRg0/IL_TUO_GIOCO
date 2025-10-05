@@ -11,6 +11,8 @@
 <body>
     <script src="scenes/UIScene.js"></script>
     <script src="scenes/GameScene.js"></script>
+    <script src="scenes/TitleScene.js"></script>
+
     <script>
     // Scena per caricare gli asset
     class Preloader extends Phaser.Scene {
@@ -34,11 +36,12 @@
             this.load.image('aristotele', 'assets/img/aristotele.png');
             this.load.image('diogene', 'assets/img/diogene.png');
             this.load.image('player', 'assets/img/player.png');
-            this.load.audio('bgm', 'assets/audio/On_the_Nature_of_Daylight.mp3');
+            this.load.audio('bgm', 'assets/audio/On_The_Nature_of_Daylight.mp3');
         }
+        
         create() {
-            this.scene.start('GameScene');
-            this.scene.launch('UIScene');
+            // Avvia solo la TitleScene (il menu principale)
+            this.scene.start('TitleScene');
         }
     }
 
@@ -54,7 +57,8 @@
                 debug: false
             }
         },
-        scene: [Preloader, GameScene, UIScene]
+        // Una sola riga con tutte le scene in ordine
+        scene: [Preloader, TitleScene, GameScene, UIScene]
     };
 
     const game = new Phaser.Game(config);
