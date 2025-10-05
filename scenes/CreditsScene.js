@@ -59,9 +59,9 @@ class CreditsScene extends Phaser.Scene {
             'Grazie per aver giocato!',
         ];
 
-        // Creiamo un oggetto testo unendo tutte le righe
-        // MODIFICATO: La coordinata Y è stata aumentata per far partire il testo da più in basso
-        const textObject = this.add.text(400, 800, creditsText, {
+        // --- LA MODIFICA È QUI ---
+        // Prima creiamo il testo a una posizione temporanea (y=0) solo per poter misurare la sua altezza
+        const textObject = this.add.text(400, 0, creditsText, {
             fontSize: '28px',
             fill: '#E0D6B3',
             fontFamily: '"Cinzel", serif',
@@ -69,11 +69,17 @@ class CreditsScene extends Phaser.Scene {
             lineSpacing: 15
         }).setOrigin(0.5);
 
+        // Ora che conosciamo la sua altezza, impostiamo la sua coordinata Y di partenza
+        // in modo che la cima del testo sia esattamente alla base dello schermo.
+        // (altezza dello schermo + metà dell'altezza del testo)
+        textObject.y = 600 + (textObject.height / 2);
+
+
         // Animazione (tween) per far scorrere il testo verso l'alto
         this.tweens.add({
             targets: textObject,
-            y: - (textObject.height / 2), // Fa scorrere il testo fino a farlo uscire dallo schermo
-            duration: 30000, // Durata dello scorrimento in millisecondi (30 secondi)
+            y: - (textObject.height / 2), // L'obiettivo finale non cambia: deve uscire tutto dallo schermo
+            duration: 30000, 
             ease: 'Linear',
             onComplete: () => {
                 // Quando i crediti sono finiti, torna al menu principale dopo 2 secondi
