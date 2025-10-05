@@ -26,7 +26,7 @@ class CreditsScene extends Phaser.Scene {
             '',
             '',
             '',
-            'Un Ringraziamento Speciale ai Pensatori:',
+            'Un Ringraziamento Speciale ai filosofi:',
             '',
             'Platone',
             'Aristotele',
@@ -49,6 +49,8 @@ class CreditsScene extends Phaser.Scene {
             'Adriano Gabriele',
             'Alessandro de Falco',
             'Testa Daniele',
+            'Giuseppe Di Mauro',
+            'Marco Aprea',
             '',
             '',
             'Grazie per aver giocato!',
@@ -76,4 +78,5 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
 
