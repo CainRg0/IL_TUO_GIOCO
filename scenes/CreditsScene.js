@@ -9,6 +9,9 @@ class CreditsScene extends Phaser.Scene {
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
 
         const creditsText = [
+            '',
+            '',
+            '',
             'La Scuola di Atene',
             '',
             '',
@@ -49,9 +52,12 @@ class CreditsScene extends Phaser.Scene {
             'Adriano Gabriele',
             'Alessandro de Falco',
             'Testa Daniele',
-            '',
-            '',
+            'Marco Aprea',
+            'Giuseppe di Mauro',
             'Grazie per aver giocato!',
+             '',
+             '',
+             '',
         ];
 
         const textObject = this.add.text(400, 650, creditsText, {
@@ -75,4 +81,5 @@ class CreditsScene extends Phaser.Scene {
             }
         });
     }
+
 }
