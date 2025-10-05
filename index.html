@@ -39,13 +39,14 @@
             this.load.image('aristotele', 'assets/img/aristotele.png');
             this.load.image('diogene', 'assets/img/diogene.png');
             this.load.image('player', 'assets/img/player.png');
+            // IMMAGINI AGGIUNTE
+            this.load.image('socrate', 'assets/img/socrate.png');
+            this.load.image('galileo', 'assets/img/galileo.png');
             
-            // <-- CORREZIONE APPLICATA QUI
-            this.load.audio('bgm', 'assets/audio/On_the_Nature_of_Daylight.mp3'); 
+            this.load.audio('bgm', 'assets/audio/bgm.mp3'); 
         }
         
         create() {
-            // Finito il caricamento, avvia il menu principale
             this.scene.start('TitleScene');
         }
     }
@@ -62,7 +63,6 @@
                 debug: false
             }
         },
-        // Elenco di tutte le scene del gioco
         scene: [Preloader, TitleScene, GameScene, UIScene]
     };
 
@@ -70,4 +70,3 @@
     </script>
 </body>
 </html>
-
