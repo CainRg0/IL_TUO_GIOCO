@@ -12,6 +12,7 @@ class TitleScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
 
+        // --- BOTTONI DEL MENU ---
         this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', {
             fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -20,6 +21,13 @@ class TitleScene extends Phaser.Scene {
             fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
+        // --- NUOVO: PULSANTE CREDITI ---
+        this.creditsButton = this.add.text(750, 560, 'Crediti', { // Posizionato in basso a destra
+            fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
+        }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+
+
+        // Eventi per i pulsanti
         this.startButton.on('pointerover', () => this.startButton.setStyle({ fill: '#fff' }));
         this.startButton.on('pointerout', () => this.startButton.setStyle({ fill: '#c5a65a' }));
         this.startButton.on('pointerdown', () => this.startGame());
@@ -28,10 +36,19 @@ class TitleScene extends Phaser.Scene {
         this.loreButton.on('pointerout', () => this.loreButton.setStyle({ fill: '#c5a65a' }));
         this.loreButton.on('pointerdown', () => this.showLore());
 
-        // --- NUOVA LOGICA AUDIO ---
-        // Creiamo l'oggetto audio del narratore ma non lo facciamo partire
-        this.narratorSound = this.sound.add('narrator');
+        // Eventi per il nuovo pulsante Crediti
+        this.creditsButton.on('pointerover', () => this.creditsButton.setStyle({ fill: '#fff' }));
+        this.creditsButton.on('pointerout', () => this.creditsButton.setStyle({ fill: '#c5a65a' }));
+        this.creditsButton.on('pointerdown', () => {
+            this.sound.stopAll(); // Ferma la musica del menu o il narratore
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                this.scene.start('CreditsScene');
+            });
+        });
 
+
+        this.narratorSound = this.sound.add('narrator');
         this.createLoreScreen();
 
         this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
@@ -49,12 +66,8 @@ class TitleScene extends Phaser.Scene {
 
     createLoreScreen() {
         this.loreGroup = this.add.group();
-
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
-        
-        // MODIFICATO: Posizione dell'immagine a sinistra
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
             '',
@@ -66,17 +79,10 @@ class TitleScene extends Phaser.Scene {
             '• Pitagora',
             '• Diogene'
         ];
-
-        // MODIFICATO: Posizione del testo a destra e larghezza ridotta
         const text = this.add.text(570, 100, loreTextContent, {
-            fontSize: '18px',
-            fill: '#000000',
-            fontStyle: 'bold',
-            align: 'center', 
-            wordWrap: { width: 380 }, // Larghezza testo ridotta
-            lineSpacing: 10
+            fontSize: '18px', fill: '#000000', fontStyle: 'bold', align: 'center', 
+            wordWrap: { width: 380 }, lineSpacing: 10
         }).setOrigin(0.5, 0);
-
         const closeButton = this.add.text(400, 560, '[ Chiudi ]', {
             fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -84,7 +90,6 @@ class TitleScene extends Phaser.Scene {
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
-
         this.loreGroup.addMultiple([bg, image, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
@@ -92,10 +97,8 @@ class TitleScene extends Phaser.Scene {
     showLore() {
         this.startButton.setVisible(false);
         this.loreButton.setVisible(false);
+        this.creditsButton.setVisible(false); // Nascondiamo anche il nuovo pulsante
         this.loreGroup.setVisible(true);
-
-        // --- NUOVA LOGICA AUDIO ---
-        // Fa partire la voce del narratore
         this.narratorSound.play();
     }
 
@@ -103,9 +106,7 @@ class TitleScene extends Phaser.Scene {
         this.loreGroup.setVisible(false);
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
-
-        // --- NUOVA LOGICA AUDIO ---
-        // Ferma la voce del narratore se stava parlando
+        this.creditsButton.setVisible(true); // Rimostriamo anche il nuovo pulsante
         if (this.narratorSound.isPlaying) {
             this.narratorSound.stop();
         }
