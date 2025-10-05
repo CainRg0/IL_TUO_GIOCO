@@ -32,5 +32,27 @@ class TitleScene extends Phaser.Scene {
                 this.scene.launch('UIScene');
             });
         });
+
+        // --- CODICE SEGRETO (KONAMI CODE) ---
+        this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
+        this.inputKeys = [];
+
+        this.input.keyboard.on('keydown', (event) => {
+            this.inputKeys.push(event.key.toUpperCase());
+            
+            if (this.inputKeys.length > this.konamiCode.length) {
+                this.inputKeys.shift();
+            }
+
+            if (this.inputKeys.join('') === this.konamiCode.join('')) {
+                console.log('Codice Segreto Attivato!');
+                
+                this.sound.stopAll();
+                this.cameras.main.fadeOut(500, 0, 0, 0);
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                    this.scene.start('CreditsScene');
+                });
+            }
+        });
     }
 }
