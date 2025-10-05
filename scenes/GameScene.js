@@ -8,7 +8,7 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#3d3d3d');
 
         // Giocatore
-        this.player = this.physics.add.sprite(100, 300, 'player');
+        this.player = this.physics.add.sprite(30, 120, 'player');
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.8); // Aggiusta la scala se necessario
 
@@ -59,4 +59,5 @@ class GameScene extends Phaser.Scene {
             this.events.emit('startDialog', canInteractWith.name);
         }
     }
+
 }
