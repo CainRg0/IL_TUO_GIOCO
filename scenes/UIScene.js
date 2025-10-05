@@ -84,8 +84,17 @@ class UIScene extends Phaser.Scene {
         if (this.typingEvent) this.typingEvent.remove();
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
-        if (correct) this.score++;
-        this.dialogText.setText(correct ? 'Corretto.' : 'Sbagliato.');
+        
+        // --- SUONI AGGIUNTI QUI ---
+        if (correct) {
+            this.score++;
+            this.dialogText.setText('Corretto.');
+            this.sound.play('correct_sfx', { volume: 0.7 });
+        } else {
+            this.dialogText.setText('Sbagliato.');
+            this.sound.play('wrong_sfx', { volume: 0.7 });
+        }
+        
         this.quizIndex++;
         this.time.delayedCall(1500, () => this.showQuestion());
     }
