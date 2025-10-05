@@ -17,22 +17,20 @@ class TitleScene extends Phaser.Scene {
             fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         
-        // --- NUOVO: Pulsante LORE ---
-        this.loreButton = this.add.text(400, 420, 'Lore', { // Posizionato sotto il pulsante Start
+        this.loreButton = this.add.text(400, 420, 'Lore', {
             fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        // Eventi per il pulsante Start
+        // Eventi per i pulsanti
         this.startButton.on('pointerover', () => this.startButton.setStyle({ fill: '#fff' }));
         this.startButton.on('pointerout', () => this.startButton.setStyle({ fill: '#c5a65a' }));
         this.startButton.on('pointerdown', () => this.startGame());
 
-        // Eventi per il pulsante Lore
         this.loreButton.on('pointerover', () => this.loreButton.setStyle({ fill: '#fff' }));
         this.loreButton.on('pointerout', () => this.loreButton.setStyle({ fill: '#c5a65a' }));
         this.loreButton.on('pointerdown', () => this.showLore());
 
-        // --- NUOVO: Elementi per la schermata LORE (inizialmente invisibili) ---
+        // --- Elementi per la schermata LORE (inizialmente invisibili) ---
         this.createLoreScreen();
 
         // --- CODICE SEGRETO (KONAMI CODE) ---
@@ -49,64 +47,57 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
-    // --- NUOVA FUNZIONE: Crea la schermata Lore ---
+    // --- Schermata Lore con le modifiche grafiche ---
     createLoreScreen() {
-        // Un gruppo per contenere tutti gli elementi della schermata Lore
         this.loreGroup = this.add.group();
 
-        // Sfondo scuro semi-trasparente
-        const bg = this.add.graphics().fillStyle(0x000000, 0.9).fillRect(0, 0, 800, 600);
+        // MODIFICATO: Sfondo chiaro (pergamena) invece che nero
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 0.9).fillRect(50, 20, 700, 560);
         
-        // Immagine del quadro
-        const image = this.add.image(400, 150, 'scuola_di_atene').setScale(0.35);
+        const image = this.add.image(400, 140, 'scuola_di_atene').setScale(0.3);
 
-        // Testo descrittivo
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
             '',
-            'La Scuola di Atene è un celebre affresco dipinto da Raffaello Sanzio tra il 1509 e il 1511. Si trova in una delle Stanze Vaticane e rappresenta la celebrazione della conoscenza e della filosofia classica, riunendo i più grandi pensatori dell\'antichità in un unico, maestoso edificio.',
+            'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.',
             '',
             'Significato e Personaggi',
-            'Al centro, Platone punta il dito verso l\'alto, indicando il mondo delle idee, mentre Aristotele tiene il palmo verso il basso, rappresentando la conoscenza basata sull\'osservazione del mondo terreno. Nel gioco incontri:',
-            '• Socrate: il maestro di Platone, riconoscibile per il suo profilo schiacciato.',
-            '• Pitagora: in primo piano, intento a scrivere su un libro le sue teorie sui numeri.',
+            'Al centro, Platone punta verso l\'alto (il mondo delle idee), mentre Aristotele indica il basso (il mondo terreno). Nel gioco incontri anche:',
+            '• Socrate: maestro di Platone, con il profilo schiacciato.',
+            '• Pitagora: in primo piano, intento a scrivere le sue teorie sui numeri.',
             '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
         ];
-        const text = this.add.text(400, 330, loreTextContent, {
-            fontSize: '16px', fill: '#ddd', align: 'center', wordWrap: { width: 700 }, lineSpacing: 5
+
+        // MODIFICATO: Posizione (y: 260) e colore del testo (fill: '#000000')
+        const text = this.add.text(400, 260, loreTextContent, {
+            fontSize: '17px', fill: '#000000', align: 'center', wordWrap: { width: 650 }, lineSpacing: 8
         }).setOrigin(0.5, 0);
 
-        // Pulsante per chiudere
-        const closeButton = this.add.text(400, 560, '[ Chiudi ]', {
-            fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
+        // MODIFICATO: Colore del pulsante per adattarsi allo sfondo chiaro
+        const closeButton = this.add.text(400, 550, '[ Chiudi ]', {
+            fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#fff' }));
-        closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#c5a65a' }));
+        closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
+        closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        // Aggiungiamo tutti gli elementi al gruppo
         this.loreGroup.addMultiple([bg, image, text, closeButton]);
-
-        // Nascondiamo il gruppo
         this.loreGroup.setVisible(false);
     }
     
-    // --- NUOVA FUNZIONE: Mostra la schermata Lore ---
     showLore() {
         this.startButton.setVisible(false);
         this.loreButton.setVisible(false);
         this.loreGroup.setVisible(true);
     }
 
-    // --- NUOVA FUNZIONE: Nasconde la schermata Lore ---
     hideLore() {
         this.loreGroup.setVisible(false);
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
     }
 
-    // --- Funzione per il codice segreto ---
     handleKonamiCode(event) {
         this.inputKeys.push(event.key.toUpperCase());
         if (this.inputKeys.length > this.konamiCode.length) {
