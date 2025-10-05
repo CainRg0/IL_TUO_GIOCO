@@ -12,24 +12,21 @@
     </style>
 </head>
 <body>
-    <script src="scenes/UIScene.js?v=2"></script>
-    <script src="scenes/GameScene.js?v=2"></script>
-    <script src="scenes/TitleScene.js?v=2"></script>
-    <script src="scenes/CreditsScene.js?v=2"></script>
-
+    <script src="scenes/UIScene.js?v=3"></script>
+    <script src="scenes/GameScene.js?v=3"></script>
+    <script src="scenes/TitleScene.js?v=3"></script>
+    <script src="scenes/CreditsScene.js?v=3"></script>
     <script>
-    // Scena per caricare tutti gli asset
     class Preloader extends Phaser.Scene {
         constructor() { super('Preloader'); }
-
         preload() {
             // ... (barra di caricamento)
 
-            // Asset per la mappa
+            // Asset per la mappa (controlla che questi percorsi siano giusti)
             this.load.image('tiles', 'assets/map/tileset.png');
             this.load.tilemapTiledJSON('map', 'assets/map/background.json');
 
-            // Altre immagini e asset
+            // Altri asset
             this.load.image('platone', 'assets/img/platone.png');
             this.load.image('aristotele', 'assets/img/aristotele.png');
             this.load.image('diogene', 'assets/img/diogene.png');
@@ -45,13 +42,8 @@
             this.load.audio('footsteps', 'assets/audio/passo.mp3');
             this.load.audio('narrator', 'assets/audio/narratore.mp3');
         }
-        
-        create() {
-            this.scene.start('TitleScene');
-        }
+        create() { this.scene.start('TitleScene'); }
     }
-
-    // Configurazione del gioco
     const config = {
         type: Phaser.AUTO,
         width: 800,
@@ -62,7 +54,6 @@
         },
         scene: [Preloader, TitleScene, GameScene, UIScene, CreditsScene]
     };
-
     const game = new Phaser.Game(config);
     </script>
 </body>
