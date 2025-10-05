@@ -89,10 +89,10 @@ class UIScene extends Phaser.Scene {
         if (correct) {
             this.score++;
             this.dialogText.setText('Corretto.');
-            this.sound.play('correct_sfx', { volume: 0.3 });
+            this.sound.play('correct_sfx', { volume: 0.1 });
         } else {
             this.dialogText.setText('Sbagliato.');
-            this.sound.play('wrong_sfx', { volume: 0.3 });
+            this.sound.play('wrong_sfx', { volume: 0.1 });
         }
         
         this.quizIndex++;
@@ -139,4 +139,5 @@ class UIScene extends Phaser.Scene {
         this.statusText.setText(text);
     }
 }
+
 
