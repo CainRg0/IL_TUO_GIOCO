@@ -20,9 +20,8 @@ class GameScene extends Phaser.Scene {
             { key: 'platone', x: 150, y: 150, scale: 0.2 },
             { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
             { key: 'diogene', x: 650, y: 150, scale: 0.2 },
-            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
-            // MODIFICATO: Scala di Pitagora ridotta
-            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
+            { key: 'socrate', x: 100, y: 500, scale: 0.1 },
+            { key: 'pitagora', x: 400, y: 300, scale: 0.1 }
         ];
 
         philosopherData.forEach(data => {
