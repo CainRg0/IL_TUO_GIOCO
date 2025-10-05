@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <title>La Scuola di Atene</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000; }
     </style>
@@ -14,11 +17,12 @@
     <script src="scenes/TitleScene.js"></script>
 
     <script>
-    // Scena per caricare gli asset
+    // Scena per caricare tutti gli asset
     class Preloader extends Phaser.Scene {
         constructor() { super('Preloader'); }
+
         preload() {
-            // Mostra una barra di caricamento
+            // Barra di caricamento
             let progressBar = this.add.graphics();
             let progressBox = this.add.graphics();
             progressBox.fillStyle(0x222222, 0.8);
@@ -28,19 +32,20 @@
                 progressBar.fillStyle(0xffffff, 1);
                 progressBar.fillRect(250, 280, 300 * value, 30);
             });
-
             this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
-            // Carica gli asset
+            // Caricamento Asset
             this.load.image('platone', 'assets/img/platone.png');
             this.load.image('aristotele', 'assets/img/aristotele.png');
             this.load.image('diogene', 'assets/img/diogene.png');
             this.load.image('player', 'assets/img/player.png');
-            this.load.audio('bgm', 'assets/audio/On_The_Nature_of_Daylight.mp3');
+            
+            // <-- CORREZIONE APPLICATA QUI
+            this.load.audio('bgm', 'assets/audio/bgm.mp3'); 
         }
         
         create() {
-            // Avvia solo la TitleScene (il menu principale)
+            // Finito il caricamento, avvia il menu principale
             this.scene.start('TitleScene');
         }
     }
@@ -57,7 +62,7 @@
                 debug: false
             }
         },
-        // Una sola riga con tutte le scene in ordine
+        // Elenco di tutte le scene del gioco
         scene: [Preloader, TitleScene, GameScene, UIScene]
     };
 
