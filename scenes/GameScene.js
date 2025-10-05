@@ -24,9 +24,13 @@ class GameScene extends Phaser.Scene {
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
+
+        // --- LOGICA PASSI: 1. Variabile per controllare la frequenza dei passi ---
+        // Memorizza il "tempo" in cui il prossimo passo potrà essere suonato
+        this.nextStepTime = 0;
     }
 
-    update() {
+    update(time, delta) { // Aggiungiamo 'time' per accedere al tempo di gioco
         if (this.dialogActive) {
             this.player.setVelocity(0);
             return;
@@ -40,6 +44,18 @@ class GameScene extends Phaser.Scene {
         
         if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
         else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
+
+        // --- LOGICA PASSI: 2. Controlliamo se il player si muove e se è ora di fare un passo ---
+        const isMoving = this.player.body.velocity.length() > 0;
+
+        // Se il giocatore si sta muovendo E il tempo di gioco attuale ha superato
+        // il tempo che avevamo memorizzato per il prossimo passo...
+        if (isMoving && time > this.nextStepTime) {
+            // ...allora suoniamo il passo!
+            this.sound.play('footsteps', { volume: 0.2 });
+            // E impostiamo il tempo per il passo successivo tra 400 millisecondi
+            this.nextStepTime = time + 400; 
+        }
 
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
