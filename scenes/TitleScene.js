@@ -28,6 +28,10 @@ class TitleScene extends Phaser.Scene {
         this.loreButton.on('pointerout', () => this.loreButton.setStyle({ fill: '#c5a65a' }));
         this.loreButton.on('pointerdown', () => this.showLore());
 
+        // --- NUOVA LOGICA AUDIO ---
+        // Creiamo l'oggetto audio del narratore ma non lo facciamo partire
+        this.narratorSound = this.sound.add('narrator');
+
         this.createLoreScreen();
 
         this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
@@ -46,11 +50,10 @@ class TitleScene extends Phaser.Scene {
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // MODIFICATO: Il pannello ora copre tutto lo schermo
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
         
-        // MODIFICATO: L'immagine separata è stata rimossa per dare spazio al testo
-        // const image = this.add.image(400, 120, 'scuola_di_atene').setScale(0.3);
+        // MODIFICATO: Posizione dell'immagine a sinistra
+        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
 
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
@@ -58,23 +61,23 @@ class TitleScene extends Phaser.Scene {
             'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.',
             '',
             'Significato e Personaggi',
-            'Al centro, Platone punta verso l\'alto (il mondo delle idee), mentre Aristotele indica il basso (il mondo terreno). Nel gioco incontri anche:',
-            '• Socrate: maestro di Platone, con il profilo schiacciato.',
-            '• Pitagora: in primo piano, intento a scrivere le sue teorie sui numeri.',
-            '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
+            'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:',
+            '• Socrate',
+            '• Pitagora',
+            '• Diogene'
         ];
 
-        // MODIFICATO: Posizione (y: 50) per partire dall'alto
-        const text = this.add.text(400, 50, loreTextContent, {
+        // MODIFICATO: Posizione del testo a destra e larghezza ridotta
+        const text = this.add.text(570, 100, loreTextContent, {
             fontSize: '18px',
             fill: '#000000',
             fontStyle: 'bold',
             align: 'center', 
-            wordWrap: { width: 700 }, // Larghezza aumentata
+            wordWrap: { width: 380 }, // Larghezza testo ridotta
             lineSpacing: 10
         }).setOrigin(0.5, 0);
 
-        const closeButton = this.add.text(400, 560, '[ Chiudi ]', { // Alzato leggermente
+        const closeButton = this.add.text(400, 560, '[ Chiudi ]', {
             fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
@@ -82,8 +85,7 @@ class TitleScene extends Phaser.Scene {
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        // Aggiungiamo solo sfondo, testo e pulsante al gruppo
-        this.loreGroup.addMultiple([bg, text, closeButton]);
+        this.loreGroup.addMultiple([bg, image, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
     
@@ -91,12 +93,22 @@ class TitleScene extends Phaser.Scene {
         this.startButton.setVisible(false);
         this.loreButton.setVisible(false);
         this.loreGroup.setVisible(true);
+
+        // --- NUOVA LOGICA AUDIO ---
+        // Fa partire la voce del narratore
+        this.narratorSound.play();
     }
 
     hideLore() {
         this.loreGroup.setVisible(false);
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
+
+        // --- NUOVA LOGICA AUDIO ---
+        // Ferma la voce del narratore se stava parlando
+        if (this.narratorSound.isPlaying) {
+            this.narratorSound.stop();
+        }
     }
 
     handleKonamiCode(event) {
