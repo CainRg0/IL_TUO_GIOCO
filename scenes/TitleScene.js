@@ -46,10 +46,11 @@ class TitleScene extends Phaser.Scene {
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(50, 20, 700, 560);
+        // MODIFICATO: Il pannello ora copre tutto lo schermo
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
         
-        // MODIFICATO: Immagine ancora più in alto
-        const image = this.add.image(400, 120, 'scuola_di_atene').setScale(0.3);
+        // MODIFICATO: L'immagine separata è stata rimossa per dare spazio al testo
+        // const image = this.add.image(400, 120, 'scuola_di_atene').setScale(0.3);
 
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
@@ -63,17 +64,17 @@ class TitleScene extends Phaser.Scene {
             '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
         ];
 
-        // --- MODIFICHE APPLICATE QUI ---
-        const text = this.add.text(400, 200, loreTextContent, { // 1. Posizione alzata (y: 200)
-            fontSize: '18px',                                 // 2. Dimensione leggermente aumentata
-            fill: '#000000',                                  // 3. Colore nero
-            fontStyle: 'bold',                                // 4. Stile grassetto per massima leggibilità
+        // MODIFICATO: Posizione (y: 50) per partire dall'alto
+        const text = this.add.text(400, 50, loreTextContent, {
+            fontSize: '18px',
+            fill: '#000000',
+            fontStyle: 'bold',
             align: 'center', 
-            wordWrap: { width: 650 }, 
-            lineSpacing: 8
+            wordWrap: { width: 700 }, // Larghezza aumentata
+            lineSpacing: 10
         }).setOrigin(0.5, 0);
 
-        const closeButton = this.add.text(400, 550, '[ Chiudi ]', {
+        const closeButton = this.add.text(400, 560, '[ Chiudi ]', { // Alzato leggermente
             fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
@@ -81,7 +82,8 @@ class TitleScene extends Phaser.Scene {
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        this.loreGroup.addMultiple([bg, image, text, closeButton]);
+        // Aggiungiamo solo sfondo, testo e pulsante al gruppo
+        this.loreGroup.addMultiple([bg, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
     
