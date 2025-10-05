@@ -1,3 +1,4 @@
+// File: scenes/UIScene.js (Versione Corretta e Definitiva)
 class UIScene extends Phaser.Scene {
     constructor() {
         super('UIScene');
@@ -132,14 +133,8 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        // CORREZIONE APPLICATA QUI
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
-            .map(p => {
-                if (p) { // Aggiunto controllo per sicurezza
-                    return `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`;
-                }
-                return '';
-            })
+            .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
         this.statusText.setText(text);
     }
