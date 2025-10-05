@@ -85,14 +85,13 @@ class UIScene extends Phaser.Scene {
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
         
-        // --- SUONI AGGIUNTI QUI ---
         if (correct) {
             this.score++;
             this.dialogText.setText('Corretto.');
-            this.sound.play('correct_sfx', { volume: 0.1 });
+            this.sound.play('correct_sfx', { volume: 0.3 });
         } else {
             this.dialogText.setText('Sbagliato.');
-            this.sound.play('wrong_sfx', { volume: 0.1 });
+            this.sound.play('wrong_sfx', { volume: 0.3 });
         }
         
         this.quizIndex++;
@@ -133,11 +132,15 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
+        // CORREZIONE APPLICATA QUI
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
-            .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
+            .map(p => {
+                if (p) { // Aggiunto controllo per sicurezza
+                    return `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`;
+                }
+                return '';
+            })
             .join('\n');
         this.statusText.setText(text);
     }
 }
-
-
