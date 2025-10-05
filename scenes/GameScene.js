@@ -13,27 +13,28 @@ class GameScene extends Phaser.Scene {
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
-            bounceX: 1,
-            bounceY: 1
+            // Rimuoviamo il rimbalzo per un comportamento più "pesante"
         });
 
         const philosopherData = [
-            { key: 'platone', x: 150, y: 150 },
-            { key: 'aristotele', x: 700, y: 500 },
-            { key: 'diogene', x: 650, y: 150 },
-            { key: 'socrate', x: 100, y: 500 },
-            { key: 'pitagora', x: 400, y: 300 }
+            { key: 'platone', x: 150, y: 150, scale: 0.2 },
+            { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
+            { key: 'diogene', x: 650, y: 150, scale: 0.2 },
+            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
+            // MODIFICATO: Scala di Pitagora ridotta
+            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key)
-                .setScale(0.2)
+                .setScale(data.scale)
                 .setName(data.key);
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             
-            // --- RIGA RIMOSSA ---
-            // philosopher.setPushable(false); // RIMOSSA: Questa riga bloccava il movimento
+            // --- MODIFICA CHIAVE ---
+            // Rendiamo i filosofi "immobili" alle collisioni. Il giocatore non potrà più spingerli.
+            philosopher.body.setImmovable(true);
         });
         
         this.physics.add.collider(this.player, this.philosophers);
