@@ -25,14 +25,20 @@ class GameScene extends Phaser.Scene {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
 
-        // --- LOGICA PASSI: 1. Variabile per controllare la frequenza dei passi ---
-        // Memorizza il "tempo" in cui il prossimo passo potrà essere suonato
-        this.nextStepTime = 0;
+        // --- NUOVA LOGICA PER I PASSI ---
+        // 1. Creiamo l'oggetto audio per i passi, ma non lo avviamo subito.
+        //    Lo impostiamo in loop e a un volume basso.
+        this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
     }
 
-    update(time, delta) { // Aggiungiamo 'time' per accedere al tempo di gioco
+    update() {
         if (this.dialogActive) {
             this.player.setVelocity(0);
+            
+            // Assicuriamoci che i passi si fermino anche se si apre un dialogo
+            if (this.footstepsSound.isPlaying) {
+                this.footstepsSound.stop();
+            }
             return;
         }
 
@@ -45,17 +51,20 @@ class GameScene extends Phaser.Scene {
         if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
         else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
 
-        // --- LOGICA PASSI: 2. Controlliamo se il player si muove e se è ora di fare un passo ---
+        // --- LOGICA DI AVVIO/STOP DEI PASSI ---
         const isMoving = this.player.body.velocity.length() > 0;
 
-        // Se il giocatore si sta muovendo E il tempo di gioco attuale ha superato
-        // il tempo che avevamo memorizzato per il prossimo passo...
-        if (isMoving && time > this.nextStepTime) {
-            // ...allora suoniamo il passo!
-            this.sound.play('footsteps', { volume: 0.2 });
-            // E impostiamo il tempo per il passo successivo tra 400 millisecondi
-            this.nextStepTime = time + 400; 
+        // Se il giocatore si sta muovendo E il suono dei passi non è già partito...
+        if (isMoving && !this.footstepsSound.isPlaying) {
+            // ...lo facciamo partire.
+            this.footstepsSound.play();
+        } 
+        // Se invece il giocatore NON si sta muovendo E il suono dei passi è attivo...
+        else if (!isMoving && this.footstepsSound.isPlaying) {
+            // ...lo fermiamo immediatamente.
+            this.footstepsSound.stop();
         }
+
 
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
