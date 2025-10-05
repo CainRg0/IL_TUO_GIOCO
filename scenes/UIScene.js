@@ -13,19 +13,20 @@ class UIScene extends Phaser.Scene {
         this.dialogBox.fillStyle(0x000000, 0.8).fillRoundedRect(50, 400, 700, 180, 16);
         this.dialogText = this.add.text(80, 420, '', { fontSize: '20px', fill: '#fff', wordWrap: { width: 640 } }).setVisible(false);
         
+        // MODIFICATO: Quiz di Pitagora al posto di quello di Galileo
         this.quizData = {
             platone: { intro: "Sono Platone. Credi che ciò che vedi sia la vera realtà? Mettiamo alla prova le tue certezze.", questions: [{ q: "La mia 'teoria delle idee' sostiene che il mondo sensibile sia la vera realtà.", a: false }, { q: "Ho scritto 'La Repubblica'.", a: true }, { q: "Ero il maestro di Aristotele.", a: true }] },
             aristotele: { intro: "Sono Aristotele. La conoscenza deriva dall'esperienza. Vediamo cosa ti ha insegnato la tua.", questions: [{ q: "Ho sostenuto che la virtù si trovi nel 'giusto mezzo'.", a: true }, { q: "Il mio maestro è stato Socrate.", a: false }, { q: "La logica è una mia invenzione.", a: true }] },
             diogene: { intro: "Sono Diogene. Spostati, mi fai ombra. Se proprio devi restare, rispondi.", questions: [{ q: "Vivevo in una botte per disprezzare i beni materiali.", a: true }, { q: "Cercavo l'uomo onesto con una lanterna in pieno giorno.", a: true }, { q: "Ho fondato la scuola degli Epicurei.", a: false }] },
             socrate: { intro: "So di non sapere. Tu cosa sai? Parliamo. Sono Socrate.", questions: [{ q: "Ho lasciato molti scritti e libri per i posteri.", a: false }, { q: "Il mio metodo di indagine era chiamato 'maieutica'.", a: true }, { q: "Sono morto di vecchiaia, circondato dai miei allievi.", a: false }] },
-            galileo: { intro: "E pur si muove! Sono Galileo. La mia scienza sfida le vecchie idee. Hai il coraggio di pensare?", questions: [{ q: "Sostenevo che fosse il Sole a girare intorno alla Terra.", a: false }, { q: "Ho perfezionato il telescopio per le mie osservazioni astronomiche.", a: true }, { q: "La Chiesa Cattolica approvò subito le mie teorie.", a: false }] }
+            pitagora: { intro: "Tutto è numero. Sono Pitagora. Sei in armonia con la matematica dell'universo? Dimostralo.", questions: [{ q: "Il mio famoso teorema riguarda i triangoli rettangoli.", a: true }, { q: "Credevo nella reincarnazione dell'anima, o metempsicosi.", a: true }, { q: "Insegnavo che mangiare fave fosse fonte di grande saggezza.", a: false }] }
         };
 
         this.gameState = { completed: [] };
         this.updateStatusText();
 
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            if (philosopher && !this.gameState.completed.includes(philosopher.name)) {
+            if (philosopher && !this.gameState.completed.includes( philosopher.name)) {
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true);
             } else {
                 this.interactionText.setVisible(false);
@@ -37,7 +38,6 @@ class UIScene extends Phaser.Scene {
         });
     }
 
-    // Funzione per l'effetto "macchina da scrivere" (versione corretta)
     typewriteText(text, onCompleteCallback) {
         const length = text.length;
         let i = 0;
@@ -146,7 +146,8 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Galileo']
+        // MODIFICATO: Elenco aggiornato con Pitagora
+        const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
             .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
         this.statusText.setText(text);
