@@ -37,34 +37,27 @@ class UIScene extends Phaser.Scene {
         });
     }
 
-    // --- FUNZIONE PER L'EFFETTO MACCHINA DA SCRIVERE ---
-    typewriteText(text, onComplete = null) {
+    // Funzione per l'effetto "macchina da scrivere" (versione corretta)
+    typewriteText(text, onCompleteCallback) {
         const length = text.length;
         let i = 0;
         this.dialogText.setText('');
         
-        if (this.typingEvent) this.typingEvent.destroy();
+        if (this.typingEvent) this.typingEvent.remove();
 
         this.typingEvent = this.time.addEvent({
             callback: () => {
                 this.dialogText.text += text[i];
                 i++;
                 if (i === length) {
-                    this.typingEvent.destroy();
-                    if (onComplete) onComplete();
+                    if (onCompleteCallback) {
+                        onCompleteCallback();
+                    }
                 }
             },
             repeat: length - 1,
             delay: 40,
         });
-
-        this.input.once('pointerdown', () => {
-            if (this.typingEvent && !this.typingEvent.hasDispatched) {
-                this.typingEvent.destroy();
-                this.dialogText.setText(text);
-                if (onComplete) onComplete();
-            }
-        }, this);
     }
 
     startDialog(philosopherName) {
@@ -75,6 +68,7 @@ class UIScene extends Phaser.Scene {
         this.dialogText.setVisible(true);
 
         const introText = this.quizData[philosopherName].intro + '\n(Clicca per continuare)';
+        
         this.typewriteText(introText, () => {
             this.input.once('pointerdown', () => this.showQuestion());
         });
@@ -109,6 +103,8 @@ class UIScene extends Phaser.Scene {
     }
 
     handleAnswer(playerAnswer) {
+        if (this.typingEvent) this.typingEvent.remove();
+
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
         if (correct) this.score++;
