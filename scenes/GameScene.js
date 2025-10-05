@@ -10,7 +10,7 @@ class GameScene extends Phaser.Scene {
         // Giocatore
         this.player = this.physics.add.sprite(30, 120, 'player');
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(0.8); // Aggiusta la scala se necessario
+        this.player.setScale(0.1); // Aggiusta la scala se necessario
 
         // Filosofi (come oggetti fisici statici)
         this.philosophers = this.physics.add.staticGroup();
@@ -61,3 +61,4 @@ class GameScene extends Phaser.Scene {
     }
 
 }
+
