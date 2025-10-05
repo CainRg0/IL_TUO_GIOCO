@@ -11,16 +11,12 @@ class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setScale(1);
 
-        // --- MODIFICA 1: GRUPPO DINAMICO ---
-        // Il gruppo ora non è più "static" per permettere il movimento.
-        // Aggiungiamo anche delle proprietà di default per i figli del gruppo.
         this.philosophers = this.physics.add.group({
-            collideWorldBounds: true, // Non escono dallo schermo
-            bounceX: 1, // Rimbalzano leggermente quando si scontrano
+            collideWorldBounds: true,
+            bounceX: 1,
             bounceY: 1
         });
 
-        // Creiamo i filosofi e impostiamo le loro proprietà fisiche
         const philosopherData = [
             { key: 'platone', x: 150, y: 150 },
             { key: 'aristotele', x: 700, y: 500 },
@@ -34,15 +30,13 @@ class GameScene extends Phaser.Scene {
                 .setScale(0.2)
                 .setName(data.key);
             
-            // Diamo una "massa" al corpo fisico per collisioni più realistiche
-            philosopher.body.setCircle(philosopher.width / 2 * 0.8); // Hitbox circolare
-            philosopher.setPushable(false); // Il giocatore non li può spingere
+            philosopher.body.setCircle(philosopher.width / 2 * 0.8);
+            
+            // --- RIGA RIMOSSA ---
+            // philosopher.setPushable(false); // RIMOSSA: Questa riga bloccava il movimento
         });
         
-        // --- MODIFICA 2: REGOLE DELLA FISICA ---
-        // Aggiungiamo una collisione tra il giocatore e i filosofi
         this.physics.add.collider(this.player, this.philosophers);
-        // Aggiungiamo una collisione tra i filosofi stessi per non farli sovrapporre
         this.physics.add.collider(this.philosophers, this.philosophers);
 
         
@@ -57,9 +51,6 @@ class GameScene extends Phaser.Scene {
         this.footstepsSound.play();
         this.footstepsSound.pause();
 
-        // --- MODIFICA 3: TIMER PER L'IA DEI MOVIMENTI ---
-        // Creiamo un evento a tempo che si ripete ogni 3 secondi (3000 ms)
-        // e che chiama la funzione per muovere i filosofi.
         this.time.addEvent({
             delay: 3000,
             callback: this.movePhilosophers,
@@ -68,33 +59,30 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    // --- NUOVA FUNZIONE PER L'IA DEI MOVIMENTI ---
     movePhilosophers() {
-        // Se c'è un dialogo attivo, non muovere nessuno
         if (this.dialogActive) {
             return;
         }
 
-        const speed = 30; // Una velocità bassa per farli "passeggiare"
+        const speed = 30;
         
-        // Per ogni filosofo nel gruppo...
         this.philosophers.getChildren().forEach(philosopher => {
-            const randNumber = Phaser.Math.Between(0, 5); // Scegli un numero casuale
+            const randNumber = Phaser.Math.Between(0, 5);
 
             switch (randNumber) {
-                case 0: // Va a Nord
+                case 0:
                     philosopher.setVelocity(0, -speed);
                     break;
-                case 1: // Va a Est
+                case 1:
                     philosopher.setVelocity(speed, 0);
                     break;
-                case 2: // Va a Sud
+                case 2:
                     philosopher.setVelocity(0, speed);
                     break;
-                case 3: // Va a Ovest
+                case 3:
                     philosopher.setVelocity(-speed, 0);
                     break;
-                default: // Rimane fermo
+                default:
                     philosopher.setVelocity(0, 0);
                     break;
             }
@@ -105,9 +93,6 @@ class GameScene extends Phaser.Scene {
     update() {
         if (this.dialogActive) {
             this.player.setVelocity(0);
-            
-            // --- MODIFICA 4: FERMIAMO I FILOSOFI QUANDO PARTE UN DIALOGO ---
-            // Usiamo una funzione del gruppo per fermare tutti i suoi membri
             this.philosophers.setVelocity(0, 0);
             
             if (!this.footstepsSound.isPaused) {
