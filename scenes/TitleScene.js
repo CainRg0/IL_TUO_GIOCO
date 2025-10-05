@@ -74,7 +74,7 @@ class TitleScene extends Phaser.Scene {
             'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.',
             '',
             'Significato e Personaggi',
-            'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:',
+            'Al centro, Platone punta verso l\'alto (il mondo delle idee), mentre Aristotele indica il basso (il mondo terreno). Nel gioco incontri anche:',
             '• Socrate',
             '• Pitagora',
             '• Diogene'
@@ -128,3 +128,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
