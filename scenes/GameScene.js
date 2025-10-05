@@ -4,27 +4,26 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Sfondo
         this.cameras.main.setBackgroundColor('#3d3d3d');
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        // Giocatore
         this.player = this.physics.add.sprite(100, 300, 'player');
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(1); // Ora che l'immagine è piccola, la scala è 1
+        this.player.setScale(1);
 
-        // Filosofi
+        // Filosofi e scienziati
         this.philosophers = this.physics.add.staticGroup();
         this.philosophers.create(250, 150, 'platone').setScale(0.2).setName('platone').refreshBody();
         this.philosophers.create(450, 450, 'aristotele').setScale(0.2).setName('aristotele').refreshBody();
         this.philosophers.create(650, 250, 'diogene').setScale(0.2).setName('diogene').refreshBody();
+        // PERSONAGGI AGGIUNTI
+        this.philosophers.create(150, 450, 'socrate').setScale(0.2).setName('socrate').refreshBody();
+        this.philosophers.create(400, 300, 'galileo').setScale(0.2).setName('galileo').refreshBody();
         
-        // Controlli
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // Musica (la avviamo qui per assicurarci che il contesto audio sia sbloccato)
-        if (!this.sound.get('bgm')) { // Controlla se sta già suonando
+        if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
     }
@@ -35,7 +34,6 @@ class GameScene extends Phaser.Scene {
             return;
         }
 
-        // Movimento
         const speed = 200;
         this.player.setVelocity(0);
 
@@ -45,7 +43,6 @@ class GameScene extends Phaser.Scene {
         if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
         else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
 
-        // Interazione
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
             const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
