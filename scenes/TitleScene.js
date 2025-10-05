@@ -12,7 +12,6 @@ class TitleScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
 
-        // --- BOTTONI DEL MENU ---
         this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', {
             fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
@@ -21,7 +20,6 @@ class TitleScene extends Phaser.Scene {
             fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        // Eventi per i pulsanti
         this.startButton.on('pointerover', () => this.startButton.setStyle({ fill: '#fff' }));
         this.startButton.on('pointerout', () => this.startButton.setStyle({ fill: '#c5a65a' }));
         this.startButton.on('pointerdown', () => this.startGame());
@@ -30,10 +28,8 @@ class TitleScene extends Phaser.Scene {
         this.loreButton.on('pointerout', () => this.loreButton.setStyle({ fill: '#c5a65a' }));
         this.loreButton.on('pointerdown', () => this.showLore());
 
-        // --- Elementi per la schermata LORE (inizialmente invisibili) ---
         this.createLoreScreen();
 
-        // --- CODICE SEGRETO (KONAMI CODE) ---
         this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
         this.inputKeys = [];
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
@@ -47,14 +43,14 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
-    // --- Schermata Lore con le modifiche grafiche ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // MODIFICATO: Sfondo chiaro (pergamena) invece che nero
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 0.9).fillRect(50, 20, 700, 560);
+        // MODIFICATO: Sfondo reso completamente opaco (secondo valore a 1)
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(50, 20, 700, 560);
         
-        const image = this.add.image(400, 140, 'scuola_di_atene').setScale(0.3);
+        // MODIFICATO: Immagine leggermente alzata per dare più spazio al testo
+        const image = this.add.image(400, 130, 'scuola_di_atene').setScale(0.3);
 
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
@@ -68,12 +64,11 @@ class TitleScene extends Phaser.Scene {
             '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
         ];
 
-        // MODIFICATO: Posizione (y: 260) e colore del testo (fill: '#000000')
-        const text = this.add.text(400, 260, loreTextContent, {
+        // MODIFICATO: Posizione (y: 220) e aggiunta ombra per leggibilità
+        const text = this.add.text(400, 220, loreTextContent, {
             fontSize: '17px', fill: '#000000', align: 'center', wordWrap: { width: 650 }, lineSpacing: 8
-        }).setOrigin(0.5, 0);
+        }).setOrigin(0.5, 0).setShadow(1, 1, '#FFFFFF', 1);
 
-        // MODIFICATO: Colore del pulsante per adattarsi allo sfondo chiaro
         const closeButton = this.add.text(400, 550, '[ Chiudi ]', {
             fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
