@@ -13,7 +13,6 @@ class UIScene extends Phaser.Scene {
         this.dialogBox.fillStyle(0x000000, 0.8).fillRoundedRect(50, 400, 700, 180, 16);
         this.dialogText = this.add.text(80, 420, '', { fontSize: '20px', fill: '#fff', wordWrap: { width: 640 } }).setVisible(false);
         
-        // QUIZ AGGIUNTI
         this.quizData = {
             platone: { intro: "Sono Platone. Credi che ciò che vedi sia la vera realtà? Mettiamo alla prova le tue certezze.", questions: [{ q: "La mia 'teoria delle idee' sostiene che il mondo sensibile sia la vera realtà.", a: false }, { q: "Ho scritto 'La Repubblica'.", a: true }, { q: "Ero il maestro di Aristotele.", a: true }] },
             aristotele: { intro: "Sono Aristotele. La conoscenza deriva dall'esperienza. Vediamo cosa ti ha insegnato la tua.", questions: [{ q: "Ho sostenuto che la virtù si trovi nel 'giusto mezzo'.", a: true }, { q: "Il mio maestro è stato Socrate.", a: false }, { q: "La logica è una mia invenzione.", a: true }] },
@@ -38,13 +37,47 @@ class UIScene extends Phaser.Scene {
         });
     }
 
+    // --- FUNZIONE PER L'EFFETTO MACCHINA DA SCRIVERE ---
+    typewriteText(text, onComplete = null) {
+        const length = text.length;
+        let i = 0;
+        this.dialogText.setText('');
+        
+        if (this.typingEvent) this.typingEvent.destroy();
+
+        this.typingEvent = this.time.addEvent({
+            callback: () => {
+                this.dialogText.text += text[i];
+                i++;
+                if (i === length) {
+                    this.typingEvent.destroy();
+                    if (onComplete) onComplete();
+                }
+            },
+            repeat: length - 1,
+            delay: 40,
+        });
+
+        this.input.once('pointerdown', () => {
+            if (this.typingEvent && !this.typingEvent.hasDispatched) {
+                this.typingEvent.destroy();
+                this.dialogText.setText(text);
+                if (onComplete) onComplete();
+            }
+        }, this);
+    }
+
     startDialog(philosopherName) {
         this.currentPhilosopher = philosopherName;
         this.quizIndex = 0;
         this.score = 0;
         this.dialogBox.setVisible(true);
-        this.dialogText.setVisible(true).setText(this.quizData[philosopherName].intro + '\n(Clicca per continuare)');
-        this.input.once('pointerdown', () => this.showQuestion());
+        this.dialogText.setVisible(true);
+
+        const introText = this.quizData[philosopherName].intro + '\n(Clicca per continuare)';
+        this.typewriteText(introText, () => {
+            this.input.once('pointerdown', () => this.showQuestion());
+        });
     }
 
     showQuestion() {
@@ -53,17 +86,22 @@ class UIScene extends Phaser.Scene {
             this.endQuiz();
             return;
         }
-        this.dialogText.setText(questionData.q);
+
         if (this.answerButtons) this.answerButtons.forEach(b => b.destroy());
-        this.answerButtons = [
-            this.createButton(250, 530, 'Vero', true),
-            this.createButton(550, 530, 'Falso', false)
-        ];
+        this.answerButtons = [];
+
+        this.typewriteText(questionData.q, () => {
+            this.answerButtons = [
+                this.createButton(250, 530, 'Vero', true),
+                this.createButton(550, 530, 'Falso', false)
+            ];
+        });
     }
     
     createButton(x, y, text, answer) {
         const button = this.add.text(x, y, text, { fontSize: '24px', fill: '#c5a65a', backgroundColor: '#111', padding: { x: 20, y: 10 }})
             .setOrigin(0.5).setInteractive({ useHandCursor: true });
+        
         button.on('pointerdown', () => this.handleAnswer(answer));
         button.on('pointerover', () => button.setStyle({ fill: '#fff' }));
         button.on('pointerout', () => button.setStyle({ fill: '#c5a65a' }));
@@ -74,7 +112,9 @@ class UIScene extends Phaser.Scene {
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
         if (correct) this.score++;
+        
         this.dialogText.setText(correct ? 'Corretto.' : 'Sbagliato.');
+        
         this.quizIndex++;
         this.time.delayedCall(1500, () => this.showQuestion());
     }
@@ -88,10 +128,10 @@ class UIScene extends Phaser.Scene {
         } else {
             endMessage += "La via per la conoscenza è ancora lunga. Riprova più tardi.";
         }
+        
         this.dialogText.setText(endMessage);
         this.updateStatusText();
 
-        // CONDIZIONE DI VITTORIA MODIFICATA
         if (this.gameState.completed.length === 5) {
             this.time.delayedCall(2000, () => this.winGame());
         } else {
@@ -110,7 +150,6 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        // ELENCO DELLO STATO MODIFICATO
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Galileo']
             .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
