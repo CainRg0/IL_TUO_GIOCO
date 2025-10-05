@@ -46,11 +46,10 @@ class TitleScene extends Phaser.Scene {
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // MODIFICATO: Sfondo reso completamente opaco (secondo valore a 1)
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(50, 20, 700, 560);
         
-        // MODIFICATO: Immagine leggermente alzata per dare più spazio al testo
-        const image = this.add.image(400, 130, 'scuola_di_atene').setScale(0.3);
+        // MODIFICATO: Immagine ancora più in alto
+        const image = this.add.image(400, 120, 'scuola_di_atene').setScale(0.3);
 
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene',
@@ -64,10 +63,15 @@ class TitleScene extends Phaser.Scene {
             '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
         ];
 
-        // MODIFICATO: Posizione (y: 220) e aggiunta ombra per leggibilità
-        const text = this.add.text(400, 220, loreTextContent, {
-            fontSize: '17px', fill: '#000000', align: 'center', wordWrap: { width: 650 }, lineSpacing: 8
-        }).setOrigin(0.5, 0).setShadow(1, 1, '#FFFFFF', 1);
+        // --- MODIFICHE APPLICATE QUI ---
+        const text = this.add.text(400, 200, loreTextContent, { // 1. Posizione alzata (y: 200)
+            fontSize: '18px',                                 // 2. Dimensione leggermente aumentata
+            fill: '#000000',                                  // 3. Colore nero
+            fontStyle: 'bold',                                // 4. Stile grassetto per massima leggibilità
+            align: 'center', 
+            wordWrap: { width: 650 }, 
+            lineSpacing: 8
+        }).setOrigin(0.5, 0);
 
         const closeButton = this.add.text(400, 550, '[ Chiudi ]', {
             fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif'
