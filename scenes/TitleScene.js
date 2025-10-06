@@ -14,7 +14,7 @@ class TitleScene extends Phaser.Scene {
         }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
 
         // MODIFICATO: "La Scuola di Atene" diventa un sottotitolo
-        this.add.text(400, 230, 'La Scuola di Atene', {
+        this.add.text(400, 230, 'Alla Scuola di Atene', {
             fontSize: '36px',
             fill: '#E0D6B3',
             fontFamily: '"Cinzel", serif'
@@ -116,3 +116,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
