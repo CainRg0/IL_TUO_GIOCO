@@ -29,7 +29,7 @@ class GameScene extends Phaser.Scene {
                 .setScale(data.scale)
                 .setName(data.key);
             
-            philosopher.body.setCircle(philosopher.width / 2 * 1.2);
+            philosopher.body.setCircle(philosopher.width / 2 * 0,1);
             
             // --- MODIFICA CHIAVE ---
             // Rendiamo i filosofi "immobili" alle collisioni. Il giocatore non potrà più spingerli.
@@ -136,6 +136,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 }
+
 
 
 
