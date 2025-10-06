@@ -1,5 +1,7 @@
 class GameScene extends Phaser.Scene {
-    constructor() { super('GameScene'); }
+    constructor() {
+        super('GameScene');
+    }
 
     create() {
         this.cameras.main.setBackgroundColor('#3d3d3d');
@@ -12,6 +14,10 @@ class GameScene extends Phaser.Scene {
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
         });
+        
+        // --- NUOVO: Gruppo per le etichette con i nomi ---
+        this.nameLabels = this.add.group();
+
         const philosopherData = [
             { key: 'platone', x: 150, y: 150, scale: 0.2 },
             { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
@@ -19,12 +25,27 @@ class GameScene extends Phaser.Scene {
             { key: 'socrate', x: 100, y: 500, scale: 0.2 },
             { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
         ];
+
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key)
                 .setScale(data.scale)
                 .setName(data.key);
+            
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
+
+            // --- NUOVO: Creiamo l'etichetta con il nome sopra il filosofo ---
+            const name = data.key.charAt(0).toUpperCase() + data.key.slice(1); // Mette la prima lettera maiuscola
+            const label = this.add.text(philosopher.x, philosopher.y - 30, name, {
+                fontSize: '14px',
+                fill: '#ffffff',
+                fontFamily: '"Cinzel", serif',
+                stroke: '#000000',
+                strokeThickness: 3
+            }).setOrigin(0.5);
+            
+            // Colleghiamo l'etichetta al filosofo per poterla aggiornare
+            philosopher.nameLabel = label;
         });
         
         this.physics.add.collider(this.player, this.philosophers);
@@ -36,6 +57,7 @@ class GameScene extends Phaser.Scene {
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
+
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
         this.footstepsSound.play();
         this.footstepsSound.pause();
@@ -64,6 +86,13 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        // --- NUOVO: Aggiorniamo la posizione delle etichette per farle seguire i personaggi ---
+        this.philosophers.getChildren().forEach(philosopher => {
+            if (philosopher.nameLabel) {
+                philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 35);
+            }
+        });
+
         if (this.dialogActive) {
             this.player.setVelocity(0);
             this.philosophers.setVelocity(0, 0);
@@ -85,12 +114,14 @@ class GameScene extends Phaser.Scene {
 
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
+            // --- MODIFICATO: Aumentata la distanza per l'interazione da 70 a 100 ---
             const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
-            if (distance < 70) {
+            if (distance < 100) {
                 canInteractWith = philosopher;
                 break;
             }
         }
+        
         this.events.emit('interactionUpdate', canInteractWith);
 
         if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
@@ -99,4 +130,3 @@ class GameScene extends Phaser.Scene {
         }
     }
 }
-
