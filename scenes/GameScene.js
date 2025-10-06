@@ -1,7 +1,5 @@
 class GameScene extends Phaser.Scene {
-    constructor() {
-        super('GameScene');
-    }
+    constructor() { super('GameScene'); }
 
     create() {
         this.cameras.main.setBackgroundColor('#3d3d3d');
@@ -9,14 +7,11 @@ class GameScene extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(100, 300, 'player');
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(0.1);
+        this.player.setScale(1);
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
         });
-        
-        this.nameLabels = this.add.group();
-
         const philosopherData = [
             { key: 'platone', x: 150, y: 150, scale: 0.2 },
             { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
@@ -24,24 +19,14 @@ class GameScene extends Phaser.Scene {
             { key: 'socrate', x: 100, y: 500, scale: 0.2 },
             { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
         ];
-
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key)
                 .setScale(data.scale)
                 .setName(data.key);
-            
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
-
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
-            const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
-                fontSize: '14px',
-                fill: '#ffffff',
-                fontFamily: '"Cinzel", serif',
-                stroke: '#000000',
-                strokeThickness: 3
-            }).setOrigin(0.5);
-            
+            const label = this.add.text(philosopher.x, philosopher.y - 45, name, { fontSize: '14px', fill: '#ffffff', fontFamily: '"Cinzel", serif', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
             philosopher.nameLabel = label;
         });
         
@@ -54,7 +39,6 @@ class GameScene extends Phaser.Scene {
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
-
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
         this.footstepsSound.play();
         this.footstepsSound.pause();
@@ -83,21 +67,15 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // --- LOGICA ETICHETTE MODIFICATA ---
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
                 let labelX = philosopher.x;
                 const labelWidth = philosopher.nameLabel.width / 2;
-
-                // Se l'etichetta esce a sinistra, la blocchiamo al bordo
                 if (labelX - labelWidth < 0) {
                     labelX = labelWidth;
-                }
-                // Se l'etichetta esce a destra, la blocchiamo al bordo
-                else if (labelX + labelWidth > this.physics.world.bounds.width) {
+                } else if (labelX + labelWidth > this.physics.world.bounds.width) {
                     labelX = this.physics.world.bounds.width - labelWidth;
                 }
-
                 philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
             }
         });
@@ -129,7 +107,6 @@ class GameScene extends Phaser.Scene {
                 break;
             }
         }
-        
         this.events.emit('interactionUpdate', canInteractWith);
 
         if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
