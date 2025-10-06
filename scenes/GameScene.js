@@ -33,7 +33,7 @@ class GameScene extends Phaser.Scene {
             
             // --- MODIFICA CHIAVE ---
             // Rendiamo i filosofi "immobili" alle collisioni. Il giocatore non potrà più spingerli.
-            philosopher.body.setImmovable(true);
+            philosopher.body.setImmovable(false);
         });
         
         this.physics.add.collider(this.player, this.philosophers);
@@ -136,6 +136,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 }
+
 
 
 
