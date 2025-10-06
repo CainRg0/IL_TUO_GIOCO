@@ -1,10 +1,13 @@
 class CreditsScene extends Phaser.Scene {
-    constructor() { super('CreditsScene'); }
+    constructor() {
+        super('CreditsScene');
+    }
 
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
+
         const creditsText = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
@@ -21,13 +24,22 @@ class CreditsScene extends Phaser.Scene {
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
-        const textObject = this.add.text(400, 800, creditsText, {
-            fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif',
-            align: 'center', lineSpacing: 15
-        }).setOrigin(0.5);
+
+        // --- LOGICA DI POSIZIONAMENTO CORRETTA ---
+        // 1. Creiamo il testo, con l'origine (il punto di riferimento) impostata in ALTO al centro.
+        //    E lo posizioniamo con il suo bordo superiore esattamente alla fine dello schermo (y: 600).
+        const textObject = this.add.text(400, 600, creditsText, {
+            fontSize: '28px',
+            fill: '#E0D6B3',
+            fontFamily: '"Cinzel", serif',
+            align: 'center',
+            lineSpacing: 15
+        }).setOrigin(0.5, 0); // Origine: 0.5 sull'asse X (centro), 0 sull'asse Y (CIMA)
+
+        // 2. Animiamo la sua posizione Y (il bordo superiore) fino a farla arrivare a -altezza totale.
         this.tweens.add({
             targets: textObject,
-            y: - (textObject.height / 2),
+            y: -textObject.height,
             duration: 60000, 
             ease: 'Linear',
             onComplete: () => {
