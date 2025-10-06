@@ -16,6 +16,7 @@
     <script src="scenes/GameScene.js"></script>
     <script src="scenes/TitleScene.js"></script>
     <script src="scenes/CreditsScene.js"></script>
+    <script src="scenes/IntroScene.js"></script>
 
     <script>
     class Preloader extends Phaser.Scene {
@@ -63,7 +64,7 @@
             default: 'arcade',
             arcade: { gravity: { y: 0 }, debug: false }
         },
-        scene: [Preloader, TitleScene, GameScene, UIScene, CreditsScene]
+        scene: [Preloader, TitleScene, IntroScene, GameScene, UIScene, CreditsScene]
     };
     const game = new Phaser.Game(config);
     </script>
