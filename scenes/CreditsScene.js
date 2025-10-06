@@ -1,11 +1,9 @@
 class CreditsScene extends Phaser.Scene {
     constructor() { super('CreditsScene'); }
-
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
-
         const creditsText = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
@@ -22,12 +20,10 @@ class CreditsScene extends Phaser.Scene {
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
-
         const textObject = this.add.text(400, 800, creditsText, {
             fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif',
             align: 'center', lineSpacing: 15
         }).setOrigin(0.5);
-
         this.tweens.add({
             targets: textObject,
             y: - (textObject.height / 2),
