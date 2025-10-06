@@ -10,9 +10,9 @@ class TitleScene extends Phaser.Scene {
 
         // --- PANNELLO MODIFICATO QUI ---
         const panel = this.add.graphics();
-        panel.fillStyle(0x000000, 0.9); // Opacità aumentata a 0.9
+        panel.fillStyle(0x000000, 0.7); // Opacità aumentata a 0.9
         // Valori cambiati: larghezza aumentata a 450 per coprire di più
-        panel.fillRoundedRect(175, 80, 450, 450, 15);
+        panel.fillRoundedRect(175, 80, 450, 470, 15);
         panel.setDepth(-1);
 
         this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
@@ -121,3 +121,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
