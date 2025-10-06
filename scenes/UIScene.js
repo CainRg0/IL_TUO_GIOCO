@@ -1,5 +1,7 @@
 class UIScene extends Phaser.Scene {
-    constructor() { super('UIScene'); }
+    constructor() {
+        super('UIScene');
+    }
 
     create() {
         this.gameScene = this.scene.get('GameScene');
@@ -39,9 +41,10 @@ class UIScene extends Phaser.Scene {
             callback: () => {
                 this.dialogText.text += text[i];
                 i++;
-                if (i === length) { if (onCompleteCallback) onCompleteCallback(); }
+                if (i === length) { if (onCompleteCallback) { onCompleteCallback(); } }
             },
-            repeat: length - 1, delay: 40
+            repeat: length - 1,
+            delay: 40,
         });
     }
 
@@ -81,6 +84,7 @@ class UIScene extends Phaser.Scene {
         if (this.typingEvent) this.typingEvent.remove();
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
+        
         if (correct) {
             this.score++;
             this.dialogText.setText('Corretto.');
@@ -89,6 +93,7 @@ class UIScene extends Phaser.Scene {
             this.dialogText.setText('Sbagliato.');
             this.sound.play('wrong_sfx', { volume: 0.3 });
         }
+        
         this.quizIndex++;
         this.time.delayedCall(1500, () => this.showQuestion());
     }
@@ -122,7 +127,7 @@ class UIScene extends Phaser.Scene {
         this.gameScene.cameras.main.fadeOut(1000, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.stop('GameScene');
-            this.scene.start('VictoryScene'); // MODIFICATO: Avvia la scena di vittoria
+            this.scene.start('VictoryScene');
         });
     }
 
@@ -130,4 +135,6 @@ class UIScene extends Phaser.Scene {
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
             .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
-        this.status
+        this.statusText.setText(text);
+    }
+}
