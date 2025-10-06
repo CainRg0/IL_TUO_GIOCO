@@ -122,7 +122,7 @@ class UIScene extends Phaser.Scene {
         this.gameScene.cameras.main.fadeOut(1000, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.stop('GameScene');
-            this.scene.start('CreditsScene');
+            this.scene.start('VictoryScene'); // MODIFICATO: Avvia la scena di vittoria
         });
     }
 
@@ -130,6 +130,4 @@ class UIScene extends Phaser.Scene {
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
             .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
-        this.statusText.setText(text);
-    }
-}
+        this.status
