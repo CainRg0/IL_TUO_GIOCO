@@ -5,11 +5,10 @@ class CreditsScene extends Phaser.Scene {
 
     create() {
         this.sound.stopAll();
-        // NOTA: Ho cambiato la chiave qui per farla corrispondere al nuovo file rinominato "credits.mp3"
-        this.sound.play('credits_music', { loop: true, volume: 0.5 }); 
+        this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
 
-        const creditsText = [
+        const creditsTextContent = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
             'Christian Rongo', '[ Game Developer ]', '',
@@ -22,28 +21,42 @@ class CreditsScene extends Phaser.Scene {
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele',
             'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea', '', '', '',
-            
-            // --- SEZIONE MUSICA AGGIUNTA ---
-            'Musiche:',
-            '',
+            'Musiche:', '',
             '"On The Heavens" by Thoribass',
             '"Refuge of the Survivors" by Scott Buckley',
-            '(Licenza Creative Commons: Attribution)',
+            '"The Introvert" by Michael Kobrin (from Pixabay)',
             '', '', '',
-
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
 
-        const textObject = this.add.text(400, 800, creditsText, {
-            fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif',
-            align: 'center', lineSpacing: 15
-        }).setOrigin(0.5);
+        const creditsContainer = this.add.container(400, 600);
 
+        // Stili per il testo
+        const normalStyle = { fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        // Stile per il nome evidenziato (leggermente più grande)
+        const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+
+        let currentY = 0;
+        const lineSpacing = 45;
+
+        creditsTextContent.forEach(line => {
+            let style = normalStyle;
+            if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
+                style = highlightStyle;
+            }
+
+            const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
+            creditsContainer.add(textLine);
+
+            currentY += lineSpacing;
+        });
+
+        // Animazione di scorrimento
         this.tweens.add({
-            targets: textObject,
-            y: - (textObject.height / 2),
-            duration: 60000, 
+            targets: creditsContainer,
+            y: -creditsContainer.height,
+            duration: 40000, // Durata ridotta a 40 secondi per velocizzare
             ease: 'Linear',
             onComplete: () => {
                 this.time.delayedCall(2000, () => {
