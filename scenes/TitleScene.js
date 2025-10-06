@@ -11,11 +11,11 @@ class TitleScene extends Phaser.Scene {
         // --- MODIFICATO: Pannello reso meno trasparente (più opaco) ---
         const panel = this.add.graphics();
         panel.fillStyle(0x000000, 0.7); // Opacità aumentata da 0.5 a 0.7
-        panel.fillRoundedRect(50, 100, 700, 380, 15);
+        panel.fillRoundedRect(150, 80, 500, 420, 15);
         panel.setDepth(-1); // Posizionato sopra il video
 
         // --- MODIFICATO: Testa di Platone resa più trasparente ---
-        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0); // Opacità ridotta da 0.7 a 0.5
+        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.4).setDepth(0); // Opacità ridotta da 0.7 a 0.5
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
@@ -121,3 +121,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
