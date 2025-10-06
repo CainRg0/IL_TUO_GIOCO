@@ -6,22 +6,22 @@ class TitleScene extends Phaser.Scene {
     create() {
         const bgVideo = this.add.video(400, 300, 'menu_bg_video');
         bgVideo.play(true);
-        bgVideo.setDepth(-2);
+        bgVideo.setDepth(-2); // Video nel livello più basso
 
         // --- PANNELLO MODIFICATO QUI ---
         const panel = this.add.graphics();
         panel.fillStyle(0x000000, 0.7);
-        // Valori cambiati: larghezza ridotta a 550, posizione y alzata a 110
-        panel.fillRoundedRect(125, 110, 200, 360, 15);
-        panel.setDepth(-1);
+        // Valori per un rettangolo verticale e più preciso
+        // (x: 225, y: 80, larghezza: 350, altezza: 450)
+        panel.fillRoundedRect(225, 80, 350, 450, 15);
+        panel.setDepth(-1); // Posizionato sopra il video
 
-        // Busto di Platone
         this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
 
-        // Titoli
+        // Testo riportato ai colori originali e messo sopra a tutto (setDepth)
         this.add.text(400, 130, 'Paideia', {
             fontSize: '72px',
             fill: '#E0D6B3',
@@ -56,8 +56,6 @@ class TitleScene extends Phaser.Scene {
         this.inputKeys = [];
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
     }
-
-    // ... (tutto il resto del codice non è stato modificato)
 
     startGame() {
         this.sound.stopAll();
@@ -124,4 +122,3 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
-
