@@ -1,5 +1,7 @@
 class TitleScene extends Phaser.Scene {
-    constructor() { super('TitleScene'); }
+    constructor() {
+        super('TitleScene');
+    }
 
     create() {
         this.add.image(400, 300, 'platone').setScale(0.8).setAlpha(0.3);
@@ -9,6 +11,7 @@ class TitleScene extends Phaser.Scene {
         this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
 
+        // Eventi pulsanti
         this.startButton.on('pointerdown', () => this.startGame());
         this.loreButton.on('pointerdown', () => this.showLore());
         this.creditsButton.on('pointerdown', () => this.showCredits());
@@ -20,13 +23,14 @@ class TitleScene extends Phaser.Scene {
 
         this.narratorSound = this.sound.add('narrator');
         this.createLoreScreen();
+
         this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
         this.inputKeys = [];
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
     }
 
     startGame() {
-        if (this.narratorSound.isPlaying) this.narratorSound.stop();
+        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.start('GameScene');
@@ -35,7 +39,7 @@ class TitleScene extends Phaser.Scene {
     }
 
     showCredits() {
-        if (this.narratorSound.isPlaying) this.narratorSound.stop();
+        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
@@ -48,10 +52,8 @@ class TitleScene extends Phaser.Scene {
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
         const loreTextContent = [
-            'L\'Affresco: La Scuola di Atene',
-            '',
-            'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.',
-            '',
+            'L\'Affresco: La Scuola di Atene', '',
+            'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.', '',
             'Significato e Personaggi',
             'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:', '• Socrate', '• Pitagora', '• Diogene'
         ];
@@ -69,6 +71,7 @@ class TitleScene extends Phaser.Scene {
         this.loreButton.setVisible(false);
         this.creditsButton.setVisible(false);
         this.loreGroup.setVisible(true);
+        if (this.sound.context.state === 'suspended') { this.sound.context.resume(); }
         this.narratorSound.play();
     }
 
@@ -77,16 +80,14 @@ class TitleScene extends Phaser.Scene {
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
         this.creditsButton.setVisible(true);
-        if (this.narratorSound.isPlaying) {
+        if (this.narratorSound && this.narratorSound.isPlaying) {
             this.narratorSound.stop();
         }
     }
 
     handleKonamiCode(event) {
         this.inputKeys.push(event.key.toUpperCase());
-        if (this.inputKeys.length > this.konamiCode.length) {
-            this.inputKeys.shift();
-        }
+        if (this.inputKeys.length > this.konamiCode.length) this.inputKeys.shift();
         if (this.inputKeys.join('') === this.konamiCode.join('')) {
             this.showCredits();
         }
