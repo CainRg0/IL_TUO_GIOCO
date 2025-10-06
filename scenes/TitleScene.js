@@ -11,7 +11,7 @@ class TitleScene extends Phaser.Scene {
         panel.fillRoundedRect(225, 80, 350, 450, 15);
         panel.setDepth(-1);
 
-        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
+        this.add.image(400, 320, 'platone').setScale(0.6).setAlpha(0.5).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
@@ -96,3 +96,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
