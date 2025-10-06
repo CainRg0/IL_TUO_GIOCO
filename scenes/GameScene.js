@@ -1,5 +1,7 @@
 class GameScene extends Phaser.Scene {
-    constructor() { super('GameScene'); }
+    constructor() {
+        super('GameScene');
+    }
 
     create() {
         this.cameras.main.setBackgroundColor('#3d3d3d');
@@ -12,6 +14,7 @@ class GameScene extends Phaser.Scene {
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
         });
+
         const philosopherData = [
             { key: 'platone', x: 150, y: 150, scale: 0.2 },
             { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
@@ -19,6 +22,7 @@ class GameScene extends Phaser.Scene {
             { key: 'socrate', x: 100, y: 500, scale: 0.2 },
             { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
         ];
+
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key)
                 .setScale(data.scale)
@@ -29,7 +33,7 @@ class GameScene extends Phaser.Scene {
         
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers);
-        
+
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
