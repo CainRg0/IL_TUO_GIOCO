@@ -8,41 +8,21 @@ class CreditsScene extends Phaser.Scene {
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
 
-        const creditsText = [
-            'Paideia',
-            '(Alla scuola di atene)',
-            '', '',
-            'Un Progetto Realizzato Da:',
-            '', '',
-            'Christian Rongo',
-            '[ Game Developer ]',
-            '',
-            'Francesco Maffettone',
-            '[ Concept Creator ]',
-            '',
-            'Pasquale Muriello',
-            '[ Art Designer ]',
-            '', '', '',
-            'Un Ringraziamento Speciale ai Pensatori:',
-            '',
-            'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora',
-            '', '', '',
-            'Hanno partecipato al progetto anche:',
-            '',
+        const creditsTextContent = [
+            'Paideia', '(Alla scuola di atene)', '', '',
+            'Un Progetto Realizzato Da:', '', '',
+            'Christian Rongo', '[ Game Developer ]', '',
+            'Francesco Maffettone', '[ Concept Creator ]', '',
+            'Pasquale Muriello', '[ Art Designer ]', '', '', '',
+            // Il resto del testo non verrà visualizzato
+            'Un Ringraziamento Speciale ai Pensatori:', '',
+            'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
+            'Hanno partecipato al progetto anche:', '',
             'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele',
-            'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea',
-            '', '', '',
-            'Musiche:',
-            '',
-            '"On The Heavens" by Thoribass',
-            '"Refuge of the Survivors" by Scott Buckley',
-            '"The Introvert" by Michael Kobrin (from Pixabay)',
-            '', '', '',
-            'ITI E. BARSANTI - POMIGLIANO D\'ARCO',
-            'Classe 4B',
-            '', '',
+            'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea', '', '', '',
+            'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
 
@@ -51,25 +31,37 @@ class CreditsScene extends Phaser.Scene {
         const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         let currentY = 0;
         const lineSpacing = 45;
+        let targetLineY = 0; // Variabile per salvare la posizione della riga di Pasquale
 
-        creditsText.forEach(line => {
+        creditsTextContent.forEach(line => {
             let style = normalStyle;
             if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
                 style = highlightStyle;
             }
+
             const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
             creditsContainer.add(textLine);
+
+            // Se troviamo la riga '[ Art Designer ]', salviamo la sua posizione
+            if (line === '[ Art Designer ]') {
+                targetLineY = currentY;
+            }
+
             currentY += lineSpacing;
         });
 
+        // Calcoliamo la posizione finale del contenitore per centrare la riga target
+        const finalY = -targetLineY + (this.sys.game.config.height / 2);
+
         this.tweens.add({
             targets: creditsContainer,
-            y: -creditsContainer.height,
-            // --- MODIFICATO: Durata ridotta per velocizzare lo scorrimento ---
-            duration: 35000, 
+            y: finalY,
+            // --- MODIFICATO: Durata ridotta drasticamente per velocizzare ---
+            duration: 15000, // 15 secondi, puoi abbassare ancora se vuoi
             ease: 'Linear',
             onComplete: () => {
-                this.time.delayedCall(2000, () => {
+                // Aspetta 3 secondi sulla scritta prima di tornare al menu
+                this.time.delayedCall(3000, () => {
                     this.sound.stopAll();
                     this.scene.start('TitleScene');
                 });
