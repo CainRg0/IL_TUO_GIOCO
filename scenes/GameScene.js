@@ -15,7 +15,6 @@ class GameScene extends Phaser.Scene {
             collideWorldBounds: true,
         });
         
-        // --- NUOVO: Gruppo per le etichette con i nomi ---
         this.nameLabels = this.add.group();
 
         const philosopherData = [
@@ -34,9 +33,10 @@ class GameScene extends Phaser.Scene {
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
 
-            // --- NUOVO: Creiamo l'etichetta con il nome sopra il filosofo ---
-            const name = data.key.charAt(0).toUpperCase() + data.key.slice(1); // Mette la prima lettera maiuscola
-            const label = this.add.text(philosopher.x, philosopher.y - 30, name, {
+            const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
+            
+            // MODIFICATO: La posizione iniziale dell'etichetta è più alta (y - 45)
+            const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
                 fontSize: '14px',
                 fill: '#ffffff',
                 fontFamily: '"Cinzel", serif',
@@ -44,7 +44,6 @@ class GameScene extends Phaser.Scene {
                 strokeThickness: 3
             }).setOrigin(0.5);
             
-            // Colleghiamo l'etichetta al filosofo per poterla aggiornare
             philosopher.nameLabel = label;
         });
         
@@ -86,10 +85,10 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // --- NUOVO: Aggiorniamo la posizione delle etichette per farle seguire i personaggi ---
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
-                philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 35);
+                // MODIFICATO: Anche la posizione di aggiornamento è più alta (y - 45)
+                philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 45);
             }
         });
 
@@ -114,7 +113,6 @@ class GameScene extends Phaser.Scene {
 
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
-            // --- MODIFICATO: Aumentata la distanza per l'interazione da 70 a 100 ---
             const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
             if (distance < 100) {
                 canInteractWith = philosopher;
