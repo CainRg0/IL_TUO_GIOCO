@@ -6,39 +6,47 @@ class TitleScene extends Phaser.Scene {
     create() {
         const bgVideo = this.add.video(400, 300, 'menu_bg_video');
         bgVideo.play(true);
-        bgVideo.setDepth(-2);
+        bgVideo.setDepth(-2); // Video nel livello più basso
 
-        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.7).setDepth(-1);
+        // --- NUOVO: Pannello semi-trasparente per leggibilità ---
+        const panel = this.add.graphics();
+        panel.fillStyle(0x000000, 0.5); // Colore nero, 50% di opacità
+        // Disegniamo un rettangolo con gli angoli arrotondati (x, y, larghezza, altezza, raggio angoli)
+        panel.fillRoundedRect(50, 100, 700, 380, 15);
+        panel.setDepth(-1); // Posizionato sopra il video
+
+        // Busto di Platone, ora sopra il pannello
+        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.7).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
 
-        // --- MODIFICATO: Colore e ombra per massima leggibilità ---
+        // --- MODIFICATO: Testo riportato ai colori originali e messo sopra a tutto (setDepth) ---
         this.add.text(400, 130, 'Paideia', {
             fontSize: '72px',
-            fill: '#FFFFFF', // Colore bianco puro
-            fontFamily: '"Cinzel", serif',
-        }).setOrigin(0.5).setShadow(3, 3, '#000000', 5); // Ombra nera più marcata
+            fill: '#E0D6B3', // Colore originale
+            fontFamily: '"Cinzel", serif'
+        }).setOrigin(0.5).setShadow(2, 2, '#000', 4).setDepth(1);
 
         this.add.text(400, 210, 'Alla Scuola di Atene', {
             fontSize: '36px',
-            fill: '#FFFFFF', // Colore bianco puro
-            fontFamily: '"Cinzel", serif',
-        }).setOrigin(0.5).setShadow(2, 2, '#000000', 5); // Ombra nera più marcata
+            fill: '#E0D6B3', // Colore originale
+            fontFamily: '"Cinzel", serif'
+        }).setOrigin(0.5).setShadow(2, 2, '#000', 4).setDepth(1);
         
-        // Pulsanti con nuovo stile
-        this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', { fontSize: '32px', fill: '#FFFFFF', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setShadow(2, 2, '#000000', 4);
-        this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#FFFFFF', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setShadow(2, 2, '#000000', 4);
-        this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#FFFFFF', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true }).setShadow(2, 2, '#000000', 4);
+        // Pulsanti con colori originali e messi sopra a tutto
+        this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', { fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
+        this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
+        this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true }).setDepth(1);
 
-        // Eventi per i pulsanti (con effetto hover leggermente diverso)
+        // Eventi per i pulsanti (l'hover ora diventa bianco)
         this.startButton.on('pointerdown', () => this.startGame());
         this.loreButton.on('pointerdown', () => this.showLore());
         this.creditsButton.on('pointerdown', () => this.showCredits());
         
         [this.startButton, this.loreButton, this.creditsButton].forEach(button => {
-            button.on('pointerover', () => button.setFill('#c5a65a')); // Diventa oro al passaggio del mouse
-            button.on('pointerout', () => button.setFill('#FFFFFF')); // Torna bianco
+            button.on('pointerover', () => button.setStyle({ fill: '#FFFFFF' }));
+            button.on('pointerout', () => button.setStyle({ fill: '#c5a65a' }));
         });
 
         this.narratorSound = this.sound.add('narrator');
