@@ -54,7 +54,7 @@ class TitleScene extends Phaser.Scene {
             this.scene.start('CreditsScene');
         });
     }
-
+    
     showVictory() {
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
