@@ -1,5 +1,7 @@
 class TitleScene extends Phaser.Scene {
-    constructor() { super('TitleScene'); }
+    constructor() {
+        super('TitleScene');
+    }
 
     create() {
         const bgVideo = this.add.video(400, 300, 'menu_bg_video');
@@ -7,11 +9,11 @@ class TitleScene extends Phaser.Scene {
         bgVideo.setDepth(-2);
 
         const panel = this.add.graphics();
-        panel.fillStyle(0x000000, 0.7);
-        panel.fillRoundedRect(225, 80, 350, 450, 15);
+        panel.fillStyle(0x000000, 0.9);
+        panel.fillRoundedRect(175, 80, 450, 450, 15);
         panel.setDepth(-1);
 
-        this.add.image(400, 320, 'platone').setScale(0.6).setAlpha(0.5).setDepth(0);
+        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
@@ -34,6 +36,7 @@ class TitleScene extends Phaser.Scene {
 
         this.narratorSound = this.sound.add('narrator');
         this.createLoreScreen();
+
         this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
         this.inputKeys = [];
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
@@ -55,11 +58,25 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
+    // --- NUOVA FUNZIONE PER ANDARE ALLA SCENA DI VITTORIA ---
+    showVictory() {
+        this.sound.stopAll();
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('VictoryScene');
+        });
+    }
+
     createLoreScreen() {
         this.loreGroup = this.add.group();
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-        const loreTextContent = [ 'L\'Affresco: La Scuola di Atene', '', 'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.', '', 'Significato e Personaggi', 'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:', '• Socrate', '• Pitagora', '• Diogene' ];
+        const loreTextContent = [
+            'L\'Affresco: La Scuola di Atene', '',
+            'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.', '',
+            'Significato e Personaggi',
+            'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:', '• Socrate', '• Pitagora', '• Diogene'
+        ];
         const text = this.add.text(570, 100, loreTextContent, { fontSize: '18px', fill: '#000000', fontStyle: 'bold', align: 'center', wordWrap: { width: 380 }, lineSpacing: 10 }).setOrigin(0.5, 0);
         const closeButton = this.add.text(400, 560, '[ Chiudi ]', { fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
@@ -84,16 +101,20 @@ class TitleScene extends Phaser.Scene {
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
         this.creditsButton.setVisible(true);
-        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
+        if (this.narratorSound && this.narratorSound.isPlaying) {
+            this.narratorSound.stop();
+        }
         if (this.menuMusic.isPaused) this.menuMusic.resume();
     }
 
     handleKonamiCode(event) {
         this.inputKeys.push(event.key.toUpperCase());
         if (this.inputKeys.length > this.konamiCode.length) this.inputKeys.shift();
+        
         if (this.inputKeys.join('') === this.konamiCode.join('')) {
-            this.showCredits();
+            console.log('Codice Segreto per la Vittoria Attivato!');
+            // --- MODIFICATO: Chiama la funzione per la vittoria ---
+            this.showVictory();
         }
     }
 }
-
