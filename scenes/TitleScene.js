@@ -6,22 +6,21 @@ class TitleScene extends Phaser.Scene {
     create() {
         const bgVideo = this.add.video(400, 300, 'menu_bg_video');
         bgVideo.play(true);
-        bgVideo.setDepth(-2); // Video nel livello più basso
+        bgVideo.setDepth(-2);
 
         // --- PANNELLO MODIFICATO QUI ---
         const panel = this.add.graphics();
-        panel.fillStyle(0x000000, 0.7);
-        // Valori per un rettangolo verticale e più preciso
-        // (x: 225, y: 80, larghezza: 350, altezza: 450)
-        panel.fillRoundedRect(225, 80, 350, 450, 15);
-        panel.setDepth(-1); // Posizionato sopra il video
+        panel.fillStyle(0x000000, 0.9); // Opacità aumentata a 0.9
+        // Valori cambiati: larghezza aumentata a 450 per coprire di più
+        panel.fillRoundedRect(175, 80, 450, 450, 15);
+        panel.setDepth(-1);
 
         this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
 
-        // Testo riportato ai colori originali e messo sopra a tutto (setDepth)
+        // Titoli
         this.add.text(400, 130, 'Paideia', {
             fontSize: '72px',
             fill: '#E0D6B3',
