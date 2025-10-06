@@ -6,21 +6,20 @@ class TitleScene extends Phaser.Scene {
     create() {
         const bgVideo = this.add.video(400, 300, 'menu_bg_video');
         bgVideo.play(true);
-        bgVideo.setDepth(-2); // Video nel livello più basso
+        bgVideo.setDepth(-2);
 
-        // --- MODIFICATO: Pannello reso meno trasparente (più opaco) ---
+        // --- PANNELLO MODIFICATO QUI ---
         const panel = this.add.graphics();
-        panel.fillStyle(0x000000, 0.7); // Opacità aumentata da 0.5 a 0.7
-        panel.fillRoundedRect(150, 80, 500, 420, 15);
-        panel.setDepth(-1); // Posizionato sopra il video
+        panel.fillStyle(0x000000, 0.7);
+        // Valori cambiati: (x: 100, y: 120, larghezza: 600, altezza: 320)
+        panel.fillRoundedRect(100, 100, 600, 350, 15);
+        panel.setDepth(-1);
 
-        // --- MODIFICATO: Testa di Platone resa più trasparente ---
-        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.4).setDepth(0); // Opacità ridotta da 0.7 a 0.5
+        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
         
         this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
         this.menuMusic.play();
 
-        // Testo riportato ai colori originali e messo sopra a tutto (setDepth)
         this.add.text(400, 130, 'Paideia', {
             fontSize: '72px',
             fill: '#E0D6B3',
@@ -33,12 +32,10 @@ class TitleScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif'
         }).setOrigin(0.5).setShadow(2, 2, '#000', 4).setDepth(1);
         
-        // Pulsanti
         this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', { fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
         this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
         this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true }).setDepth(1);
 
-        // Eventi per i pulsanti
         this.startButton.on('pointerdown', () => this.startGame());
         this.loreButton.on('pointerdown', () => this.showLore());
         this.creditsButton.on('pointerdown', () => this.showCredits());
@@ -121,4 +118,3 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
-
