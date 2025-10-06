@@ -14,7 +14,7 @@ class TitleScene extends Phaser.Scene {
         }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
 
         // MODIFICATO: Sottotitolo aggiornato
-        this.add.text(400, 250, '(Alla scuola di atene)', {
+        this.add.text(400, 250, 'ALLA SCUOLA DI ATENE', {
             fontSize: '32px',
             fill: '#E0D6B3',
             fontFamily: '"Cinzel", serif'
@@ -116,3 +116,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
