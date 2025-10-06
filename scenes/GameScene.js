@@ -9,9 +9,7 @@ class GameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
 
-        this.philosophers = this.physics.add.group({
-            collideWorldBounds: true,
-        });
+        this.philosophers = this.physics.add.group({ collideWorldBounds: true });
         const philosopherData = [
             { key: 'platone', x: 150, y: 150, scale: 0.2 },
             { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
