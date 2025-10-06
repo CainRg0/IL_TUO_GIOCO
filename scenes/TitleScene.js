@@ -1,40 +1,19 @@
 class TitleScene extends Phaser.Scene {
-    constructor() {
-        super('TitleScene');
-    }
+    constructor() { super('TitleScene'); }
 
     create() {
+        // --- AVVIO MUSICA MENU ---
+        this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
+        this.menuMusic.play();
+
         this.add.image(400, 300, 'platone').setScale(0.8).setAlpha(0.3);
-
-        // MODIFICATO: "Paideia" diventa più piccolo
-        this.add.text(400, 180, 'Paideia', {
-            fontSize: '60px',
-            fill: '#E0D6B3',
-            fontFamily: '"Cinzel", serif'
-        }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
-
-        // MODIFICATO: Sottotitolo aggiornato
-        this.add.text(400, 250, 'ALLA SCUOLA DI ATENE', {
-            fontSize: '32px',
-            fill: '#E0D6B3',
-            fontFamily: '"Cinzel", serif'
-        }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
-
-
-        this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', {
-            fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this.add.text(400, 180, 'Paideia', { fontSize: '60px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
+        this.add.text(400, 250, '(Alla scuola di atene)', { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setShadow(2, 2, '#000', 4);
         
-        this.loreButton = this.add.text(400, 420, 'Lore', {
-            fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', { fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
 
-        this.creditsButton = this.add.text(750, 560, 'Crediti', {
-            fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif'
-        }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
-
-
-        // Eventi per i pulsanti
         this.startButton.on('pointerdown', () => this.startGame());
         this.loreButton.on('pointerdown', () => this.showLore());
         this.creditsButton.on('pointerdown', () => this.showCredits());
@@ -53,7 +32,7 @@ class TitleScene extends Phaser.Scene {
     }
 
     startGame() {
-        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
+        this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.start('GameScene');
@@ -62,7 +41,6 @@ class TitleScene extends Phaser.Scene {
     }
 
     showCredits() {
-        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
@@ -94,6 +72,8 @@ class TitleScene extends Phaser.Scene {
         this.loreButton.setVisible(false);
         this.creditsButton.setVisible(false);
         this.loreGroup.setVisible(true);
+
+        if (this.menuMusic.isPlaying) this.menuMusic.pause(); // Mette in pausa la musica del menu
         if (this.sound.context.state === 'suspended') { this.sound.context.resume(); }
         this.narratorSound.play();
     }
@@ -103,9 +83,9 @@ class TitleScene extends Phaser.Scene {
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
         this.creditsButton.setVisible(true);
-        if (this.narratorSound && this.narratorSound.isPlaying) {
-            this.narratorSound.stop();
-        }
+
+        if (this.narratorSound && this.narratorSound.isPlaying) this.narratorSound.stop();
+        if (this.menuMusic.isPaused) this.menuMusic.resume(); // Fa ripartire la musica del menu
     }
 
     handleKonamiCode(event) {
@@ -116,4 +96,3 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
-
