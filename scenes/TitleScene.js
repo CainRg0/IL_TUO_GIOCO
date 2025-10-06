@@ -12,7 +12,7 @@ class TitleScene extends Phaser.Scene {
         const panel = this.add.graphics();
         panel.fillStyle(0x000000, 0.7);
         // Valori cambiati: larghezza ridotta a 550, posizione y alzata a 110
-        panel.fillRoundedRect(125, 110, 550, 350, 15);
+        panel.fillRoundedRect(125, 110, 200, 360, 15);
         panel.setDepth(-1);
 
         // Busto di Platone
@@ -124,3 +124,4 @@ class TitleScene extends Phaser.Scene {
         }
     }
 }
+
