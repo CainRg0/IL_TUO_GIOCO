@@ -1,5 +1,6 @@
 class CreditsScene extends Phaser.Scene {
     constructor() { super('CreditsScene'); }
+
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
