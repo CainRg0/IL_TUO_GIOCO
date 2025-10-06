@@ -12,25 +12,39 @@
     </style>
 </head>
 <body>
-    <script src="scenes/UIScene.js"></script>
-    <script src="scenes/GameScene.js"></script>
-    <script src="scenes/TitleScene.js"></script>
-    <script src="scenes/CreditsScene.js"></script>
-    <script src="scenes/IntroScene.js"></script>
-    <script src="scenes/VictoryScene.js"></script>
+    <script src="scenes/UIScene.js?v=ULTIMATE"></script>
+    <script src="scenes/GameScene.js?v=ULTIMATE"></script>
+    <script src="scenes/TitleScene.js?v=ULTIMATE"></script>
+    <script src="scenes/CreditsScene.js?v=ULTIMATE"></script>
+    <script src="scenes/IntroScene.js?v=ULTIMATE"></script>
+    <script src="scenes/VictoryScene.js?v=ULTIMATE"></script>
 
     <script>
     class Preloader extends Phaser.Scene {
         constructor() { super('Preloader'); }
         preload() {
-            // ... (barra di caricamento)
+            let progressBar = this.add.graphics();
+            let progressBox = this.add.graphics();
+            progressBox.fillStyle(0x222222, 0.8);
+            progressBox.fillRect(240, 270, 320, 50);
+            this.load.on('progress', (value) => {
+                progressBar.clear();
+                progressBar.fillStyle(0xffffff, 1);
+                progressBar.fillRect(250, 280, 300 * value, 30);
+            });
+            this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
             // Video e Immagini
             this.load.video('menu_bg_video', 'assets/video/menu_background.mp4', 'loadeddata', false, true);
             this.load.image('platone', 'assets/img/platone.png');
-            // ... (altre immagini)
+            this.load.image('aristotele', 'assets/img/aristotele.png');
+            this.load.image('diogene', 'assets/img/diogene.png');
+            this.load.image('player', 'assets/img/player.png');
+            this.load.image('socrate', 'assets/img/socrate.png');
+            this.load.image('pitagora', 'assets/img/pitagora.png');
+            this.load.image('scuola_di_atene', 'assets/img/scuola_di_atene.jpg');
             
-            // Audio
+            // Audio (con i nomi originali che preferisci)
             this.load.audio('bgm', 'assets/audio/On_the_Nature_of_Daylight.mp3'); 
             this.load.audio('menu_music', 'assets/audio/On_The_Heavens.mp3');
             this.load.audio('credits_music', 'assets/audio/Refuge_Of_The_Survivors.mp3');
@@ -38,12 +52,21 @@
             this.load.audio('wrong_sfx', 'assets/audio/wrong.mp3');
             this.load.audio('footsteps', 'assets/audio/footstep_on_bricks.mp3');
             this.load.audio('narrator', 'assets/audio/narrator.mp3');
-            // --- NUOVO SUONO VITTORIA ---
             this.load.audio('victory_sound', 'assets/audio/Victory.mp3');
         }
         create() { this.scene.start('TitleScene'); }
     }
-    // ... (config del gioco)
+    const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: { gravity: { y: 0 }, debug: false }
+        },
+        scene: [Preloader, TitleScene, IntroScene, GameScene, UIScene, VictoryScene, CreditsScene]
+    };
+    const game = new Phaser.Game(config);
     </script>
 </body>
 </html>
