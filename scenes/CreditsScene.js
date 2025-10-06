@@ -12,7 +12,7 @@ class CreditsScene extends Phaser.Scene {
             'Un Ringraziamento Speciale ai Pensatori:', '',
             'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '','davide sorrentino'',
             'Hanno partecipato al gruppo:', '',
-            'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
+            'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele',
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore','
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele', '', '',
             'Grazie per aver giocato!',
@@ -35,4 +35,5 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
 
