@@ -14,7 +14,6 @@ class CreditsScene extends Phaser.Scene {
             'Christian Rongo', '[ Game Developer ]', '',
             'Francesco Maffettone', '[ Concept Creator ]', '',
             'Pasquale Muriello', '[ Art Designer ]', '', '', '',
-            // Il resto del testo non verrà visualizzato
             'Un Ringraziamento Speciale ai Pensatori:', '',
             'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
             'Hanno partecipato al progetto anche:', '',
@@ -31,37 +30,59 @@ class CreditsScene extends Phaser.Scene {
         const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         let currentY = 0;
         const lineSpacing = 45;
-        let targetLineY = 0; // Variabile per salvare la posizione della riga di Pasquale
+        
+        let targetLineObject = null; // Variabile per salvare l'oggetto di testo target
 
         creditsTextContent.forEach(line => {
             let style = normalStyle;
             if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
                 style = highlightStyle;
             }
-
             const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
             creditsContainer.add(textLine);
 
-            // Se troviamo la riga '[ Art Designer ]', salviamo la sua posizione
+            // Se troviamo la riga '[ Art Designer ]', salviamo l'oggetto di testo
             if (line === '[ Art Designer ]') {
-                targetLineY = currentY;
+                targetLineObject = textLine;
             }
 
             currentY += lineSpacing;
         });
 
-        // Calcoliamo la posizione finale del contenitore per centrare la riga target
-        const finalY = -targetLineY + (this.sys.game.config.height / 2);
+        // --- NUOVA LOGICA DI ANIMAZIONE E STOP ---
+        this.isStopping = false; // Una variabile per assicurarci di fermarci una sola volta
 
         this.tweens.add({
             targets: creditsContainer,
-            y: finalY,
-            // --- MODIFICATO: Durata ridotta drasticamente per velocizzare ---
-            duration: 15000, // 15 secondi, puoi abbassare ancora se vuoi
+            y: -creditsContainer.height, // L'obiettivo è sempre scorrere tutto il testo
+            duration: 25000, // Velocità a 25 secondi
             ease: 'Linear',
+            
+            // Aggiungiamo un controllo ad ogni frame dell'animazione
+            onUpdate: (tween) => {
+                if (!targetLineObject || this.isStopping) {
+                    return; // Se non abbiamo un target o ci stiamo già fermando, non fare nulla
+                }
+
+                // Calcoliamo la posizione Y "reale" del nostro testo target
+                const targetWorldY = creditsContainer.y + targetLineObject.y;
+
+                // Se la posizione del testo supera il centro dello schermo...
+                if (targetWorldY <= 300) {
+                    this.isStopping = true; // Marchiamo che ci stiamo fermando
+                    tween.pause(); // Mettiamo in pausa lo scorrimento
+
+                    // Aspettiamo 3 secondi, poi torniamo al menu
+                    this.time.delayedCall(3000, () => {
+                        this.sound.stopAll();
+                        this.scene.start('TitleScene');
+                    });
+                }
+            },
+
             onComplete: () => {
-                // Aspetta 3 secondi sulla scritta prima di tornare al menu
-                this.time.delayedCall(3000, () => {
+                // Se i crediti finiscono normalmente (nel caso il target non venga trovato)
+                this.time.delayedCall(2000, () => {
                     this.sound.stopAll();
                     this.scene.start('TitleScene');
                 });
