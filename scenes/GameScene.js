@@ -9,7 +9,7 @@ class GameScene extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(100, 300, 'player');
         this.player.setCollideWorldBounds(true);
-        this.player.setScale(1);
+        this.player.setScale(0.1);
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
@@ -104,3 +104,4 @@ class GameScene extends Phaser.Scene {
         }
     }
 }
+
