@@ -10,21 +10,24 @@ class CreditsScene extends Phaser.Scene {
 
         // --- TESTO DEI CREDITI AGGIORNATO ---
         const creditsText = [
-            'La Scuola di Atene', '', '',
+            'Paideia',
+            '(Alla scuola di atene)', // MODIFICATO
+            '', '',
             'Un Progetto Realizzato Da:', '', '',
             'Christian Rongo', '[ Game Developer ]', '',
             'Francesco Maffettone', '[ Concept Creator ]', '',
             'Pasquale Muriello', '[ Art Designer ]', '', '', '',
             'Un Ringraziamento Speciale ai Pensatori:', '',
             'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
-            'Hanno partecipato al gruppo:', '',
+            'Hanno partecipato al progetto anche:', // MODIFICATO
+            '',
             'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele',
-            'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea', // NOMI AGGIUNTI
+            'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea',
             '', '', '',
-            'ITI E. BARSANTI - POMIGLIANO D\'ARCO', // SCUOLA AGGIUNTA
-            'Classe 4B', // CLASSE AGGIUNTA
+            'ITI E. BARSANTI - POMIGLIANO D\'ARCO',
+            'Classe 4B',
             '', '',
             'Grazie per aver giocato!',
         ];
