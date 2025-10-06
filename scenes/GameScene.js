@@ -34,8 +34,6 @@ class GameScene extends Phaser.Scene {
             philosopher.body.setImmovable(true);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
-            
-            // MODIFICATO: La posizione iniziale dell'etichetta è più alta (y - 45)
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
                 fontSize: '14px',
                 fill: '#ffffff',
@@ -85,10 +83,22 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        // --- LOGICA ETICHETTE MODIFICATA ---
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
-                // MODIFICATO: Anche la posizione di aggiornamento è più alta (y - 45)
-                philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 45);
+                let labelX = philosopher.x;
+                const labelWidth = philosopher.nameLabel.width / 2;
+
+                // Se l'etichetta esce a sinistra, la blocchiamo al bordo
+                if (labelX - labelWidth < 0) {
+                    labelX = labelWidth;
+                }
+                // Se l'etichetta esce a destra, la blocchiamo al bordo
+                else if (labelX + labelWidth > this.physics.world.bounds.width) {
+                    labelX = this.physics.world.bounds.width - labelWidth;
+                }
+
+                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
             }
         });
 
