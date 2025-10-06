@@ -10,10 +10,10 @@ class CreditsScene extends Phaser.Scene {
             'Francesco Maffettone', '[ Concept Creator ]', '',
             'Pasquale Muriello', '[ Art Designer ]', '', '', '',
             'Un Ringraziamento Speciale ai Pensatori:', '',
-            'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '','davide sorrentino'',
+            'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
             'Hanno partecipato al gruppo:', '',
-            'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele',
-            'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore','
+            'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
+            'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele', '', '',
             'Grazie per aver giocato!',
         ];
@@ -35,5 +35,3 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
-
-
