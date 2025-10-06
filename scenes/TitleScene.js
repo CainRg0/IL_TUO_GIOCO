@@ -1,7 +1,5 @@
 class TitleScene extends Phaser.Scene {
-    constructor() {
-        super('TitleScene');
-    }
+    constructor() { super('TitleScene'); }
 
     create() {
         this.add.image(400, 300, 'platone').setScale(0.8).setAlpha(0.3);
