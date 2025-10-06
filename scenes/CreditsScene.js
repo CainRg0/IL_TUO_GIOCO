@@ -5,13 +5,13 @@ class CreditsScene extends Phaser.Scene {
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
         const creditsText = [
-            'La Scuola di Atene', '', '', 'Un Progetto Realizzato Da:', '', '',
+            'Alla Scuola di Atene', '', '', 'Un Progetto Realizzato Da:', '', '',
             'Christian Rongo', '[ Game Developer ]', '',
             'Francesco Maffettone', '[ Concept Creator ]', '',
             'Pasquale Muriello', '[ Art Designer ]', '', '', '',
             'Un Ringraziamento Speciale ai Pensatori:', '',
             'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
-            'Hanno partecipato al gruppo:', '',
+            'Hanno partecipato al progetto:', '',
             'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele', '', '',
@@ -35,3 +35,4 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
