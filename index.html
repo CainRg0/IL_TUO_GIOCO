@@ -17,6 +17,7 @@
     <script src="scenes/TitleScene.js"></script>
     <script src="scenes/CreditsScene.js"></script>
     <script src="scenes/IntroScene.js"></script>
+    <script src="scenes/VictoryScene.js"></script>
 
     <script>
     class Preloader extends Phaser.Scene {
@@ -32,9 +33,6 @@
                 progressBar.fillRect(250, 280, 300 * value, 30);
             });
             this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
-
-            // Video
-            this.load.video('menu_bg_video', 'assets/video/menu_background.mp4', 'loadeddata', false, true);
 
             // Immagini
             this.load.image('platone', 'assets/img/platone.png');
@@ -64,7 +62,7 @@
             default: 'arcade',
             arcade: { gravity: { y: 0 }, debug: false }
         },
-        scene: [Preloader, TitleScene, IntroScene, GameScene, UIScene, CreditsScene]
+        scene: [Preloader, TitleScene, IntroScene, GameScene, UIScene, VictoryScene, CreditsScene]
     };
     const game = new Phaser.Game(config);
     </script>
