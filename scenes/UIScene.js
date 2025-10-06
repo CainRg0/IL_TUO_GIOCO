@@ -1,8 +1,5 @@
-// VERSIONE DI TEST PER ISOLARE L'ERRORE
 class UIScene extends Phaser.Scene {
-    constructor() {
-        super('UIScene');
-    }
+    constructor() { super('UIScene'); }
 
     create() {
         this.gameScene = this.scene.get('GameScene');
@@ -42,10 +39,9 @@ class UIScene extends Phaser.Scene {
             callback: () => {
                 this.dialogText.text += text[i];
                 i++;
-                if (i === length) { if (onCompleteCallback) { onCompleteCallback(); } }
+                if (i === length) { if (onCompleteCallback) onCompleteCallback(); }
             },
-            repeat: length - 1,
-            delay: 40,
+            repeat: length - 1, delay: 40
         });
     }
 
@@ -85,7 +81,6 @@ class UIScene extends Phaser.Scene {
         if (this.typingEvent) this.typingEvent.remove();
         this.answerButtons.forEach(b => b.destroy());
         const correct = this.quizData[this.currentPhilosopher].questions[this.quizIndex].a === playerAnswer;
-        
         if (correct) {
             this.score++;
             this.dialogText.setText('Corretto.');
@@ -94,7 +89,6 @@ class UIScene extends Phaser.Scene {
             this.dialogText.setText('Sbagliato.');
             this.sound.play('wrong_sfx', { volume: 0.3 });
         }
-        
         this.quizIndex++;
         this.time.delayedCall(1500, () => this.showQuestion());
     }
@@ -132,17 +126,10 @@ class UIScene extends Phaser.Scene {
         });
     }
 
-    // --- FUNZIONE PROBLEMATICA DISATTIVATA ---
     updateStatusText() {
-        console.log("updateStatusText CHIAMATA - Se vedi questo, il file è aggiornato.");
-        // Il codice che causa l'errore è stato temporaneamente rimosso per il test.
-        // Se il gioco parte, significa che il problema è la cache
-        // e che il browser non stava caricando le versioni corrette.
-        /*
         const text = ['Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora']
             .map(p => `${p.charAt(0).toUpperCase() + p.slice(1)}: ${this.gameState.completed.includes(p.toLowerCase()) ? '✓' : '✗'}`)
             .join('\n');
         this.statusText.setText(text);
-        */
     }
 }
