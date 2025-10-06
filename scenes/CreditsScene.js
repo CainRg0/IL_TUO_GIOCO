@@ -21,6 +21,10 @@ class CreditsScene extends Phaser.Scene {
             'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
             'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele',
             'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea', '', '', '',
+            'Musiche:', '',
+            '"On The Heavens" by Thoribass',
+            '"Refuge of the Survivors" by Scott Buckley',
+            '"The Introvert" by Michael Kobrin (from Pixabay)', '', '', '',
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
@@ -30,8 +34,6 @@ class CreditsScene extends Phaser.Scene {
         const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         let currentY = 0;
         const lineSpacing = 45;
-        
-        let targetLineObject = null; // Variabile per salvare l'oggetto di testo target
 
         creditsTextContent.forEach(line => {
             let style = normalStyle;
@@ -40,51 +42,34 @@ class CreditsScene extends Phaser.Scene {
             }
             const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
             creditsContainer.add(textLine);
-
-            // Se troviamo la riga '[ Art Designer ]', salviamo l'oggetto di testo
-            if (line === '[ Art Designer ]') {
-                targetLineObject = textLine;
-            }
-
             currentY += lineSpacing;
         });
 
-        // --- NUOVA LOGICA DI ANIMAZIONE E STOP ---
-        this.isStopping = false; // Una variabile per assicurarci di fermarci una sola volta
-
+        // Animazione di scorrimento
         this.tweens.add({
             targets: creditsContainer,
-            y: -creditsContainer.height, // L'obiettivo è sempre scorrere tutto il testo
-            duration: 25000, // Velocità a 25 secondi
+            y: -creditsContainer.height, // Scorre fino alla fine
+            duration: 40000,
             ease: 'Linear',
             
-            // Aggiungiamo un controllo ad ogni frame dell'animazione
-            onUpdate: (tween) => {
-                if (!targetLineObject || this.isStopping) {
-                    return; // Se non abbiamo un target o ci stiamo già fermando, non fare nulla
-                }
+            // --- MODIFICA CHIAVE ---
+            // Alla fine dell'animazione, invece di cambiare scena, crea il pulsante.
+            onComplete: () => {
+                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
+                    fontSize: '24px',
+                    fill: '#c5a65a',
+                    fontFamily: '"Cinzel", serif'
+                }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-                // Calcoliamo la posizione Y "reale" del nostro testo target
-                const targetWorldY = creditsContainer.y + targetLineObject.y;
+                restartButton.on('pointerover', () => restartButton.setStyle({ fill: '#FFFFFF' }));
+                restartButton.on('pointerout', () => restartButton.setStyle({ fill: '#c5a65a' }));
 
-                // Se la posizione del testo supera il centro dello schermo...
-                if (targetWorldY <= 300) {
-                    this.isStopping = true; // Marchiamo che ci stiamo fermando
-                    tween.pause(); // Mettiamo in pausa lo scorrimento
-
-                    // Aspettiamo 3 secondi, poi torniamo al menu
-                    this.time.delayedCall(3000, () => {
-                        this.sound.stopAll();
+                restartButton.on('pointerdown', () => {
+                    this.sound.stopAll();
+                    this.cameras.main.fadeOut(500, 0, 0, 0);
+                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
                         this.scene.start('TitleScene');
                     });
-                }
-            },
-
-            onComplete: () => {
-                // Se i crediti finiscono normalmente (nel caso il target non venga trovato)
-                this.time.delayedCall(2000, () => {
-                    this.sound.stopAll();
-                    this.scene.start('TitleScene');
                 });
             }
         });
