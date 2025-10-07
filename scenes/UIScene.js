@@ -4,12 +4,12 @@ class UIScene extends Phaser.Scene {
     }
 
     create() {
-        this.gameScene = this.scene.get('GameScene'); // Ottieni un riferimento alla GameScene
-
+        this.gameScene = this.scene.get('GameScene'); 
+        
         // Testo per lo stato del gioco (es. "Filosofi trovati: 0/5")
         this.statusText = this.add.text(20, 20, '', { 
             fontSize: '18px', 
-            fill: '#000000', // Colore nero
+            fill: '#000000', 
             fontStyle: 'bold', 
             fontFamily: '"Cinzel", serif' 
         });
@@ -23,10 +23,10 @@ class UIScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif' 
         }).setOrigin(0.5).setVisible(false);
         
-        // Pannello del dialogo (più scuro e grande)
+        // Pannello del dialogo 
         this.dialogBox = this.add.graphics();
         this.dialogBox.fillStyle(0x000000, 0.8)
-                      .fillRect(50, 400, 700, 180) // x, y, width, height
+                      .fillRect(50, 400, 700, 180) 
                       .setVisible(false);
 
         // Testo del dialogo
@@ -49,7 +49,7 @@ class UIScene extends Phaser.Scene {
         this.dialogButton.on('pointerover', () => this.dialogButton.setStyle({ fill: '#ffff99' }));
         this.dialogButton.on('pointerout', () => this.dialogButton.setStyle({ fill: '#ffffff' }));
 
-        // Dati dei quiz (una sola domanda per filosofo)
+        // Dati dei quiz
         this.quizData = {
             platone: {
                 question: "Platone: Qual è l'essenza della realtà?",
@@ -88,25 +88,22 @@ class UIScene extends Phaser.Scene {
             completed: [], 
             score: 0 
         };
-        this.currentPhilosopher = null; 
+        this.currentPhilosopher = null; // Il filosofo con cui si sta interagendo (nome)
         this.dialogState = 'dialog'; 
 
         this.updateStatusText();
 
         // Eventi dalla GameScene
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            // Mostra/nascondi il testo di interazione solo se il gioco non è bloccato e il filosofo non è già completato
-            if (!this.gameScene.dialogActive && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
+            // Mostra/nascondi il testo di interazione solo se il giocatore NON è bloccato e il filosofo non è già completato
+            if (!this.gameScene.isPlayerBlocked && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
             } else { 
                 this.interactionText.setVisible(false); 
             }
         });
         this.gameScene.events.on('startDialog', (philosopherName) => { 
-            // Inizia il dialogo solo se la GameScene non ha ancora bloccato il gioco
-            if (!this.gameScene.dialogActive) { 
-                this.startDialog(philosopherName); 
-            }
+            this.startDialog(philosopherName); 
         });
     }
 
@@ -115,9 +112,14 @@ class UIScene extends Phaser.Scene {
     }
 
     startDialog(philosopherName) {
-        // La GameScene ha già impostato dialogActive = true
-        this.currentPhilosopher = philosopherName;
+        this.currentPhilosopher = philosopherName; // Imposta il filosofo corrente
         this.dialogState = 'dialog';
+
+        // Trova il filosofo nell'array di GameScene e fermalo
+        const philosopherSprite = this.gameScene.philosophers.getChildren().find(p => p.name === philosopherName);
+        if (philosopherSprite) {
+            philosopherSprite.setVelocity(0, 0); // Ferma il filosofo con cui si parla
+        }
 
         this.dialogBox.setVisible(true);
         this.dialogText.setVisible(true);
@@ -140,13 +142,13 @@ class UIScene extends Phaser.Scene {
         if (this.dialogState === 'dialog') {
             this.showQuiz();
         } else if (this.dialogState === 'result') {
-            this.endDialog(); // Se è il risultato, cliccando "Continua" si chiude
+            this.endDialog(); 
         }
     }
 
     showQuiz() {
         this.dialogState = 'quiz';
-        this.dialogButton.setVisible(false); // Nascondi il pulsante Continua durante il quiz
+        this.dialogButton.setVisible(false); 
         const quiz = this.quizData[this.currentPhilosopher];
         this.typewriteText(quiz.question);
 
@@ -179,7 +181,7 @@ class UIScene extends Phaser.Scene {
 
         this.dialogButton.setVisible(true).setText('Continua'); 
         this.dialogButton.off('pointerdown');
-        this.dialogButton.on('pointerdown', () => this.endDialog()); // Al clic, chiudi il dialogo
+        this.dialogButton.on('pointerdown', () => this.endDialog()); 
 
         if (selectedOption === correctAnswer) {
             this.gameState.score++;
@@ -202,14 +204,13 @@ class UIScene extends Phaser.Scene {
             this.optionsButtons = null;
         }
 
-        // Segna il filosofo come completato SOLO se è stata data una risposta (corretta o sbagliata)
         if (!this.gameState.completed.includes(this.currentPhilosopher) && this.dialogState === 'result') {
             this.gameState.completed.push(this.currentPhilosopher);
             this.updateStatusText();
         }
 
         this.currentPhilosopher = null;
-        // --- EMETTI L'EVENTO PER SBLOCCARE LA GAMESCENE ---
+        // --- EMETTI L'EVENTO PER SBLOCCARE IL MOVIMENTO DEL GIOCATORE ---
         this.gameScene.events.emit('endDialog'); 
         this.dialogState = 'end'; 
 
@@ -225,7 +226,6 @@ class UIScene extends Phaser.Scene {
     typewriteText(text) {
         this.dialogText.setText('');
         let i = 0;
-        // Interrompi scritture precedenti se ne inizia una nuova
         if (this._typewritingEvent) {
             this._typewritingEvent.remove();
         }
