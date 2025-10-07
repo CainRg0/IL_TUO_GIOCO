@@ -49,8 +49,8 @@ class CreditsScene extends Phaser.Scene {
         this.tweens.add({
             targets: creditsContainer,
             y: -creditsContainer.height,
-            // --- MODIFICATO: Durata aumentata per rallentare lo scorrimento ---
-            duration: 40000, 
+            // --- MODIFICATO: Durata impostata a 30 secondi ---
+            duration: 30000, 
             ease: 'Linear',
             onComplete: () => {
                 const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
