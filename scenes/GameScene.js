@@ -21,7 +21,6 @@ class GameScene extends Phaser.Scene {
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
-            // --- MODIFICA 1: Aggiunto un leggero rimbalzo per collisioni più naturali ---
             bounceX: 0.5,
             bounceY: 0.5
         });
@@ -40,8 +39,10 @@ class GameScene extends Phaser.Scene {
                 .setName(data.key);
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
-            // Non più immobili, così possono respingersi a vicenda
-            // philosopher.body.setImmovable(true); 
+
+            // --- CORREZIONE APPLICATA QUI ---
+            // REINSERITO: Rende il filosofo non spingibile dal giocatore, ma gli permette di scontrarsi con gli altri.
+            philosopher.body.setImmovable(true); 
 
             this.physics.add.collider(philosopher, walls);
 
@@ -58,8 +59,6 @@ class GameScene extends Phaser.Scene {
         });
         
         this.physics.add.collider(this.player, this.philosophers);
-        
-        // --- MODIFICA 2: Aggiunta la collisione tra i filosofi stessi ---
         this.physics.add.collider(this.philosophers, this.philosophers);
         
         this.cursors = this.input.keyboard.createCursorKeys();
