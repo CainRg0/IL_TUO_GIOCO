@@ -1,14 +1,10 @@
 class CreditsScene extends Phaser.Scene {
-    constructor() {
-        super('CreditsScene');
-    }
-
+    constructor() { super('CreditsScene'); }
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
-
-        const creditsText = [
+        const creditsTextContent = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
             'Christian Rongo', '[ Game Developer ]', '',
@@ -28,35 +24,37 @@ class CreditsScene extends Phaser.Scene {
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
-
-        // Creiamo il testo con l'origine in alto al centro (0.5, 0)
-        // e lo posizioniamo con il suo bordo superiore appena sotto lo schermo (y: 600)
-        const textObject = this.add.text(400, 600, creditsText, {
-            fontSize: '28px',
-            fill: '#E0D6B3',
-            fontFamily: '"Cinzel", serif',
-            align: 'center',
-            lineSpacing: 15
-        }).setOrigin(0.5, 0);
-
-        // Animazione (tween) per far scorrere il testo verso l'alto
+        const creditsContainer = this.add.container(400, 600);
+        const normalStyle = { fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        const smallStyle = { fontSize: '20px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        let currentY = 0;
+        const lineSpacing = 45;
+        creditsTextContent.forEach(line => {
+            let style = normalStyle;
+            if (line === 'Christian Rongo' || line === '[ Game Developer ]') { style = highlightStyle; } 
+            else if (line.startsWith('"')) { style = smallStyle; }
+            const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
+            creditsContainer.add(textLine);
+            currentY += lineSpacing;
+        });
         this.tweens.add({
-            targets: textObject,
-            // L'obiettivo è far arrivare il bordo superiore del testo
-            // fino a una posizione sopra lo schermo pari all'altezza del testo stesso
-            y: -textObject.height,
-            // MODIFICATO: Durata ridotta a 25 secondi per velocizzare lo scorrimento
-            duration: 55000,
+            targets: creditsContainer,
+            y: -creditsContainer.height,
+            duration: 30000,
             ease: 'Linear',
             onComplete: () => {
-                // Quando i crediti sono finiti, torna al menu principale dopo 2 secondi
-                this.time.delayedCall(2000, () => {
+                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+                restartButton.on('pointerover', () => restartButton.setStyle({ fill: '#FFFFFF' }));
+                restartButton.on('pointerout', () => restartButton.setStyle({ fill: '#c5a65a' }));
+                restartButton.on('pointerdown', () => {
                     this.sound.stopAll();
-                    this.scene.start('TitleScene');
+                    this.cameras.main.fadeOut(500, 0, 0, 0);
+                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                        this.scene.start('TitleScene');
+                    });
                 });
             }
         });
     }
 }
-
-
