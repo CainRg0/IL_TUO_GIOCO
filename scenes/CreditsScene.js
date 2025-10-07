@@ -1,9 +1,13 @@
 class CreditsScene extends Phaser.Scene {
-    constructor() { super('CreditsScene'); }
+    constructor() {
+        super('CreditsScene');
+    }
+
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
+
         const creditsTextContent = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
@@ -24,32 +28,40 @@ class CreditsScene extends Phaser.Scene {
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
+
         const creditsContainer = this.add.container(400, 600);
         const normalStyle = { fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
-        const smallStyle = { fontSize: '20px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         let currentY = 0;
         const lineSpacing = 45;
+
         creditsTextContent.forEach(line => {
             let style = normalStyle;
             if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
                 style = highlightStyle;
-            } else if (line.startsWith('"')) {
-                style = smallStyle;
             }
             const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
             creditsContainer.add(textLine);
             currentY += lineSpacing;
         });
+
+        // Animazione di scorrimento
         this.tweens.add({
             targets: creditsContainer,
             y: -creditsContainer.height,
-            duration: 30000,
+            // --- MODIFICATO: Durata aumentata per rallentare lo scorrimento ---
+            duration: 40000, 
             ease: 'Linear',
             onComplete: () => {
-                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
+                    fontSize: '24px',
+                    fill: '#c5a65a',
+                    fontFamily: '"Cinzel", serif'
+                }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
                 restartButton.on('pointerover', () => restartButton.setStyle({ fill: '#FFFFFF' }));
                 restartButton.on('pointerout', () => restartButton.setStyle({ fill: '#c5a65a' }));
+
                 restartButton.on('pointerdown', () => {
                     this.sound.stopAll();
                     this.cameras.main.fadeOut(500, 0, 0, 0);
