@@ -128,4 +128,42 @@ class GameScene extends Phaser.Scene {
                 } else if (labelX + labelWidth > this.physics.world.bounds.width) {
                     labelX = this.physics.world.bounds.width - labelWidth;
                 }
-                philosopher.nameLabel.setPosition(labelX
+                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
+            }
+        });
+
+        const playerSpeed = 200;
+        this.player.setVelocity(0);
+
+        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
+        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
+
+        const isMoving = this.player.body.velocity.length() > 0;
+        if (isMoving && this.footstepsSound.isPaused) {
+            this.footstepsSound.resume();
+        } 
+        else if (!isMoving && !this.footstepsSound.isPaused) {
+            this.footstepsSound.pause();
+        }
+
+        let canInteractWith = null;
+        for (const philosopher of this.philosophers.getChildren()) {
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
+            if (distance < 100) {
+                canInteractWith = philosopher;
+                break;
+            }
+        }
+        
+        // Emette l'evento per la UIScene per mostrare il testo [E] Parla (se il dialogo non è attivo)
+        this.events.emit('interactionUpdate', canInteractWith);
+
+        // Se il giocatore è vicino e preme 'E', e nessun dialogo è attivo
+        if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey) && !this.dialogActive) {
+            this.dialogActive = true; // Blocca il movimento del gioco
+            this.events.emit('startDialog', canInteractWith.name);
+        }
+    }
+}
