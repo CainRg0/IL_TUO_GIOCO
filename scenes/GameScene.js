@@ -4,27 +4,27 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Add the background image
+        // Aggiunge l'immagine di sfondo
         this.add.image(400, 300, 'game_bg').setDepth(-1);
 
-        // --- INVISIBLE WALLS ---
-        // Create a static physics group for the walls
+        // --- MURI INVISIBILI ---
         const walls = this.physics.add.staticGroup();
-
-        // Top wall (under the arches)
-        walls.create(400, 50, 'wall').setSize(800, 100).setVisible(false);
-        // Left wall
-        walls.create(50, 300, 'wall').setSize(100, 600).setVisible(false);
-        // Right wall
-        walls.create(750, 300, 'wall').setSize(100, 600).setVisible(false);
+        // Muro superiore
+        walls.create(400, 80).setSize(800, 160).setVisible(false);
+        // Muro sinistro
+        walls.create(80, 300).setSize(160, 600).setVisible(false);
+        // Muro destro
+        walls.create(720, 300).setSize(160, 600).setVisible(false);
+        // Muro inferiore
+        walls.create(400, 580).setSize(800, 40).setVisible(false);
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        this.player = this.physics.add.sprite(100, 300, 'player');
+        this.player = this.physics.add.sprite(400, 500, 'player'); // Posizione di partenza aggiornata
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
 
-        // Add collider between player and the invisible walls
+        // Aggiunge la collisione tra il giocatore e i muri invisibili
         this.physics.add.collider(this.player, walls);
 
         this.philosophers = this.physics.add.group({
@@ -32,11 +32,11 @@ class GameScene extends Phaser.Scene {
         });
 
         const philosopherData = [
-            { key: 'platone', x: 150, y: 150, scale: 0.2 },
-            { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
-            { key: 'diogene', x: 650, y: 150, scale: 0.2 },
-            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
-            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
+            { key: 'platone', x: 250, y: 250, scale: 0.2 },
+            { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 220, scale: 0.2 },
+            { key: 'socrate', x: 200, y: 400, scale: 0.2 },
+            { key: 'pitagora', x: 600, y: 400, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
@@ -47,7 +47,7 @@ class GameScene extends Phaser.Scene {
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
 
-            // Add collider between philosophers and the invisible walls
+            // Aggiunge la collisione tra i filosofi e i muri invisibili
             this.physics.add.collider(philosopher, walls);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
@@ -100,6 +100,58 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // ... (the rest of the update function does not need to change)
+        this.philosophers.getChildren().forEach(philosopher => {
+            if (philosopher.nameLabel) {
+                let labelX = philosopher.x;
+                const labelWidth = philosopher.nameLabel.width / 2;
+                if (labelX - labelWidth < 0) {
+                    labelX = labelWidth;
+                } else if (labelX + labelWidth > this.physics.world.bounds.width) {
+                    labelX = this.physics.world.bounds.width - labelWidth;
+                }
+                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
+            }
+        });
+
+        if (this.dialogActive) {
+            this.player.setVelocity(0);
+            this.philosophers.setVelocity(0, 0);
+            if (!this.footstepsSound.isPaused) {
+                this.footstepsSound.pause();
+            }
+            return;
+        }
+
+        const playerSpeed = 200;
+        this.player.setVelocity(0);
+
+        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
+        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
+
+        const isMoving = this.player.body.velocity.length() > 0;
+        if (isMoving && this.footstepsSound.isPaused) {
+            this.footstepsSound.resume();
+        } 
+        else if (!isMoving && !this.footstepsSound.isPaused) {
+            this.footstepsSound.pause();
+        }
+
+        let canInteractWith = null;
+        for (const philosopher of this.philosophers.getChildren()) {
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
+            if (distance < 100) {
+                canInteractWith = philosopher;
+                break;
+            }
+        }
+        
+        this.events.emit('interactionUpdate', canInteractWith);
+
+        if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+            this.dialogActive = true;
+            this.events.emit('startDialog', canInteractWith.name);
+        }
     }
 }
