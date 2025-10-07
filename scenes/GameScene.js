@@ -2,8 +2,9 @@ class GameScene extends Phaser.Scene {
     constructor() { super('GameScene'); }
 
     create() {
-        // Ripristinato lo sfondo a tinta unita, che è stabile e funzionante
-        this.cameras.main.setBackgroundColor('#3d3d3d');
+        // --- SFONDO MODIFICATO ---
+        this.add.image(400, 300, 'game_bg').setDepth(-1);
+
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
         this.player = this.physics.add.sprite(100, 300, 'player');
