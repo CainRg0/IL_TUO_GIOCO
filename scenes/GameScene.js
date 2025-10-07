@@ -9,50 +9,43 @@ class GameScene extends Phaser.Scene {
         
         const walls = this.physics.add.staticGroup();
 
-        // --- BARRIERE INVISIBILI AGGIORNATE (SOLO per i margini esterni) ---
-        // Queste barriere sono posizionate per coprire i bordi esterni della "stanza" visibile
-        // e impedire che i personaggi vadano fuori dallo spazio giocabile.
-        // Ho provato a stimare i bordi più esterni e il "pavimento" visibile nella tua immagine.
+        // --- BARRIERE INVISIBILI: PIÙ PICCOLE E MIRATE AL BORDO DELL'AREA GIOCABILE ---
+        // Ho regolato questi valori per essere molto più vicini ai bordi effettivi del pavimento
+        // e delle pareti che si vedono nell'immagine, lasciando quasi tutto lo spazio centrale libero.
         
-        // Barriera SUPERIORE: Lungo il bordo superiore del pavimento giocabile.
-        // Impedisce di andare "sopra" le teste dei filosofi e gli sfondi superiori.
-        walls.create(400, 160).setSize(800, 20).setVisible(false); 
+        // Barriera SUPERIORE (blocco dove finisce il pavimento superiore visibile)
+        walls.create(400, 190).setSize(600, 20).setVisible(false); // x, y, width, height
         
-        // Barriera INFERIORE: Lungo il bordo inferiore del pavimento giocabile.
-        // Impedisce di andare "sotto" il bordo della mappa visibile.
-        walls.create(400, 560).setSize(800, 20).setVisible(false); 
+        // Barriera INFERIORE (blocco dove inizia il "marciapiede" in primo piano)
+        walls.create(400, 520).setSize(600, 20).setVisible(false); 
         
-        // Barriera SINISTRA: Copre il bordo sinistro della mappa.
-        // Impedisce di andare "dietro" le colonne di sinistra.
-        walls.create(100, 360).setSize(20, 400).setVisible(false); 
+        // Barriera SINISTRA (blocco lungo le colonne più interne a sinistra)
+        walls.create(190, 350).setSize(20, 340).setVisible(false); // Aumentato un po' l'altezza
         
-        // Barriera DESTRA: Copre il bordo destro della mappa.
-        // Impedisce di andare "dietro" le colonne di destra.
-        walls.create(700, 360).setSize(20, 400).setVisible(false); 
+        // Barriera DESTRA (blocco lungo le colonne più interne a destra)
+        walls.create(610, 350).setSize(20, 340).setVisible(false); // Aumentato un po' l'altezza
         
-        // NON CI SONO ALTRE BARRIERE INTERNE. TUTTO LO SPAZIO TRA QUESTE BARRIERE È LIBERO.
-
-        // --- FINE BARRIERE INVISIBILI AGGIORNATE ---
+        // --- FINE BARRIERE AGGIORNATE ---
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        this.player = this.physics.add.sprite(400, 550, 'player'); 
+        this.player = this.physics.add.sprite(400, 480, 'player'); 
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
+        
+        // --- SOLO IL PLAYER COLLIDE CON LE BARRIERE ---
         this.physics.add.collider(this.player, walls);
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
         });
 
-        // Ho leggermente modificato le posizioni iniziali dei filosofi per essere più centrali
-        // e lontani dalle barriere, per evitare che vengano bloccati all'inizio.
         const philosopherData = [
-            { key: 'platone', x: 250, y: 250, scale: 0.2 },
-            { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
-            { key: 'diogene', x: 400, y: 280, scale: 0.2 },
-            { key: 'socrate', x: 200, y: 450, scale: 0.2 },
-            { key: 'pitagora', x: 600, y: 450, scale: 0.15 }
+            { key: 'platone', x: 250, y: 300, scale: 0.2 },
+            { key: 'aristotele', x: 550, y: 300, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 330, scale: 0.2 },
+            { key: 'socrate', x: 200, y: 400, scale: 0.2 },
+            { key: 'pitagora', x: 600, y: 400, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
@@ -62,7 +55,9 @@ class GameScene extends Phaser.Scene {
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
-            this.physics.add.collider(philosopher, walls);
+            
+            // --- I FILOSOFI NON COLLIDONO PIÙ CON LE BARRIERE ('walls') ---
+            // Ho rimosso: this.physics.add.collider(philosopher, walls);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -77,7 +72,7 @@ class GameScene extends Phaser.Scene {
         });
         
         this.physics.add.collider(this.player, this.philosophers);
-        this.physics.add.collider(this.philosophers, this.philosophers);
+        this.physics.add.collider(this.philosophers, this.philosophers); // I filosofi collidono ancora tra loro
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
