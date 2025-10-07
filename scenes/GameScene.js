@@ -1,245 +1,150 @@
-class UIScene extends Phaser.Scene {
+class GameScene extends Phaser.Scene {
     constructor() {
-        super('UIScene');
+        super('GameScene');
     }
 
     create() {
-        this.gameScene = this.scene.get('GameScene'); // Ottieni un riferimento alla GameScene
-        this.gameScene.dialogActive = false; // Inizializza lo stato del dialogo nella GameScene
+        // Add the background image
+        this.add.image(400, 300, 'game_bg').setDepth(-1);
 
-        // Testo per lo stato del gioco (es. "Filosofi trovati: 0/5")
-        this.statusText = this.add.text(20, 20, '', { 
-            fontSize: '18px', 
-            fill: '#000000', 
-            fontStyle: 'bold', 
-            fontFamily: '"Cinzel", serif' 
-        });
-
-        // Testo per l'interazione ([E] Parla)
-        this.interactionText = this.add.text(400, 450, '[E] Parla', { 
-            fontSize: '20px', 
-            fill: '#fff', 
-            backgroundColor: '#000', 
-            padding: { x: 10, y: 5 },
-            fontFamily: '"Cinzel", serif' 
-        }).setOrigin(0.5).setVisible(false);
+        // --- INVISIBLE WALLS --- (Questi non c'erano nel codice che mi hai dato l'ultima volta, ma sono importanti per i bordi del mondo. Li ho reinseriti.)
+        const walls = this.physics.add.staticGroup();
+        walls.create(400, 80).setSize(800, 160).setVisible(false);
+        walls.create(80, 300).setSize(160, 600).setVisible(false);
+        walls.create(720, 300).setSize(160, 600).setVisible(false);
+        walls.create(400, 580).setSize(800, 40).setVisible(false);
         
-        // Pannello del dialogo (più scuro e grande)
-        this.dialogBox = this.add.graphics();
-        this.dialogBox.fillStyle(0x000000, 0.8)
-                      .fillRect(50, 400, 700, 180) // x, y, width, height
-                      .setVisible(false);
+        this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        // Testo del dialogo
-        this.dialogText = this.add.text(70, 420, '', { 
-            fontSize: '20px', 
-            fill: '#fff', 
-            wordWrap: { width: 660 },
-            fontFamily: '"Cinzel", serif' 
-        }).setVisible(false);
+        // Player starts at the bottom center
+        this.player = this.physics.add.sprite(400, 550, 'player'); // Modificato per la posizione in basso al centro
+        this.player.setCollideWorldBounds(true);
+        this.player.setScale(0.1);
+        this.physics.add.collider(this.player, walls); // Player collides with invisible walls
 
-        // Pulsante per chiudere il dialogo o per la risposta
-        this.dialogButton = this.add.text(680, 550, 'Continua', { 
-            fontSize: '20px', 
-            fill: '#fff', 
-            backgroundColor: '#333333', 
-            padding: { x: 10, y: 5 },
-            fontFamily: '"Cinzel", serif' 
-        }).setOrigin(1, 1).setInteractive({ useHandCursor: true }).setVisible(false);
-
-        // Eventi del pulsante per cambio colore al passaggio del mouse
-        this.dialogButton.on('pointerover', () => this.dialogButton.setStyle({ fill: '#ffff99' }));
-        this.dialogButton.on('pointerout', () => this.dialogButton.setStyle({ fill: '#ffffff' }));
-
-        // Dati dei quiz
-        this.quizData = {
-            platone: {
-                question: "Platone: Qual è l'essenza della realtà?",
-                options: ["Le Idee eterne", "La materia in continuo mutamento", "Le sensazioni individuali"],
-                correct: "Le Idee eterne",
-                dialog: "Ah, il mondo delle idee... la vera essenza della realtà è lì, oltre i sensi. Hai capito bene, giovane studente."
-            },
-            aristotele: {
-                question: "Aristotele: Cosa si intende per 'entelechia'?",
-                options: ["Il puro atto", "Il fine immanente di ogni cosa", "La negazione della materia"],
-                correct: "Il fine immanente di ogni cosa",
-                dialog: "Esatto! L'entelechia è il principio che porta ogni essere a realizzare la propria forma perfetta. La tua mente è acuta."
-            },
-            diogene: {
-                question: "Diogene: Qual è il fondamento della felicità secondo me?",
-                options: ["La ricchezza materiale", "Il piacere sensoriale", "L'autosufficienza e l'indipendenza"],
-                correct: "L'autosufficienza e l'indipendenza",
-                dialog: "Non c'è nulla di più vero! La vera libertà sta nel non desiderare nulla, nell'essere padroni di se stessi. Ben detto!"
-            },
-            socrate: {
-                question: "Socrate: Qual è il principio fondamentale del mio pensiero?",
-                options: ["Conosci te stesso", "La materia è eterna", "Il dubbio universale"],
-                correct: "Conosci te stesso",
-                dialog: "Saggezza pura! La conoscenza di sé è la chiave per una vita virtuosa. La tua anima ha sete di sapere."
-            },
-            pitagora: {
-                question: "Pitagora: Qual è l'elemento fondamentale dell'universo?",
-                options: ["L'acqua", "Il fuoco", "Il numero"],
-                correct: "Il numero",
-                dialog: "Magnifico! L'intero cosmo è un'armonia di numeri e proporzioni. Hai colto il segreto dell'universo."
-            }
-        };
-
-        // Stato del gioco
-        this.gameState = { 
-            completed: [], // Filosofi con cui si è già interagito
-            score: 0 
-        };
-        this.currentPhilosopher = null; // Il filosofo con cui si sta interagendo
-        this.dialogState = 'dialog'; // 'dialog', 'quiz', 'result', 'end'
-
-        this.updateStatusText();
-
-        // Eventi dalla GameScene
-        this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            // Mostra/nascondi il testo di interazione solo se non c'è un dialogo attivo
-            if (!this.gameScene.dialogActive && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
-                this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
-            } else { 
-                this.interactionText.setVisible(false); 
-            }
-        });
-        this.gameScene.events.on('startDialog', (philosopherName) => { 
-            if (!this.gameScene.dialogActive) { // Evita dialoghi multipli
-                this.startDialog(philosopherName); 
-            }
-        });
-    }
-
-    updateStatusText() {
-        this.statusText.setText(`Filosofi Trovati: ${this.gameState.completed.length}/5\nRisposte Corrette: ${this.gameState.score}`);
-    }
-
-    startDialog(philosopherName) {
-        this.gameScene.dialogActive = true; // Blocca il movimento del giocatore
-        this.currentPhilosopher = philosopherName;
-        this.dialogState = 'dialog';
-
-        this.dialogBox.setVisible(true);
-        this.dialogText.setVisible(true);
-        this.dialogButton.setVisible(true).setText('Continua'); // Reset testo del pulsante
-        this.interactionText.setVisible(false); // Nascondi il testo "[E] Parla"
-
-        // Rimuovi eventuali risposte quiz precedenti
-        if (this.optionsButtons) {
-            this.optionsButtons.forEach(btn => btn.destroy());
-            this.optionsButtons = null;
-        }
-
-        const initialDialog = `Ciao! Sono ${philosopherName}. Sei pronto a mettere alla prova la tua saggezza?`;
-        this.typewriteText(initialDialog);
-
-        this.dialogButton.off('pointerdown'); // Rimuovi listener precedenti
-        this.dialogButton.on('pointerdown', () => this.nextDialog());
-    }
-
-    nextDialog() {
-        if (this.dialogState === 'dialog') {
-            this.showQuiz();
-        } else if (this.dialogState === 'quiz') {
-            // Questo non dovrebbe essere chiamato, le risposte gestiscono lo stato quiz
-        } else if (this.dialogState === 'result') {
-            this.endDialog();
-        } else if (this.dialogState === 'end') {
-            // Fine del dialogo, chiudi tutto
-            this.endDialog();
-        }
-    }
-
-    showQuiz() {
-        this.dialogState = 'quiz';
-        this.dialogButton.setVisible(false); // Nascondi il pulsante Continua durante il quiz
-        const quiz = this.quizData[this.currentPhilosopher];
-        this.typewriteText(quiz.question);
-
-        this.optionsButtons = [];
-        let yOffset = 460;
-        quiz.options.forEach(option => {
-            const optionBtn = this.add.text(70, yOffset, `- ${option}`, {
-                fontSize: '18px', 
-                fill: '#fff', 
-                backgroundColor: '#1a1a1a', 
-                padding: { x: 10, y: 5 },
-                wordWrap: { width: 660 },
-                fontFamily: '"Cinzel", serif'
-            }).setInteractive({ useHandCursor: true });
-
-            optionBtn.on('pointerover', () => optionBtn.setStyle({ fill: '#ffff99', backgroundColor: '#4a4a4a' }));
-            optionBtn.on('pointerout', () => optionBtn.setStyle({ fill: '#ffffff', backgroundColor: '#1a1a1a' }));
-            optionBtn.on('pointerdown', () => this.checkAnswer(option, quiz.correct, quiz.dialog));
-            this.optionsButtons.push(optionBtn);
-            yOffset += optionBtn.height + 5; // Spazio tra le opzioni
-        });
-    }
-
-    checkAnswer(selectedOption, correctAnswer, dialogOnCorrect) {
-        this.dialogState = 'result';
-        // Disabilita tutti i pulsanti delle opzioni
-        this.optionsButtons.forEach(btn => {
-            btn.disableInteractive();
-            btn.setStyle({ fill: '#888888', backgroundColor: '#1a1a1a' }); // Colore grigio
+        this.philosophers = this.physics.add.group({
+            collideWorldBounds: true,
         });
 
-        this.dialogButton.setVisible(true).setText('Continua'); // Mostra pulsante continua
-        this.dialogButton.off('pointerdown');
-        this.dialogButton.on('pointerdown', () => this.endDialog());
+        const philosopherData = [
+            { key: 'platone', x: 200, y: 180, scale: 0.2 }, // Posizioni aggiustate
+            { key: 'aristotele', x: 600, y: 180, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 200, scale: 0.2 },
+            { key: 'socrate', x: 150, y: 400, scale: 0.2 },
+            { key: 'pitagora', x: 650, y: 400, scale: 0.15 }
+        ];
 
-        if (selectedOption === correctAnswer) {
-            this.gameState.score++;
-            this.sound.play('correct_sfx');
-            this.typewriteText("Corretto!\n" + dialogOnCorrect);
-        } else {
-            this.sound.play('wrong_sfx');
-            this.typewriteText("Sbagliato. La risposta corretta era: " + correctAnswer);
-        }
-        this.updateStatusText();
-    }
+        philosopherData.forEach(data => {
+            const philosopher = this.philosophers.create(data.x, data.y, data.key)
+                .setScale(data.scale)
+                .setName(data.key);
+            
+            philosopher.body.setCircle(philosopher.width / 2 * 0.8);
+            philosopher.body.setImmovable(true);
+            this.physics.add.collider(philosopher, walls); // Philosophers collide with invisible walls
 
-    endDialog() {
-        this.dialogBox.setVisible(false);
-        this.dialogText.setVisible(false);
-        this.dialogButton.setVisible(false);
+            const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
+            const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
+                fontSize: '14px',
+                fill: '#ffffff',
+                fontFamily: '"Cinzel", serif',
+                stroke: '#000000',
+                strokeThickness: 3
+            }).setOrigin(0.5);
+            
+            philosopher.nameLabel = label;
+        });
         
-        if (this.optionsButtons) {
-            this.optionsButtons.forEach(btn => btn.destroy());
-            this.optionsButtons = null;
+        this.physics.add.collider(this.player, this.philosophers);
+        this.physics.add.collider(this.philosophers, this.philosophers);
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+        if (!this.sound.get('bgm')) {
+            this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
 
-        // Segna il filosofo come completato SOLO se è stata data una risposta (corretta o sbagliata)
-        if (!this.gameState.completed.includes(this.currentPhilosopher) && this.dialogState === 'result') {
-            this.gameState.completed.push(this.currentPhilosopher);
-            this.updateStatusText();
-        }
+        this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
+        this.footstepsSound.play();
+        this.footstepsSound.pause();
 
-        this.currentPhilosopher = null;
-        this.gameScene.dialogActive = false; // Sblocca il movimento del giocatore
-        this.dialogState = 'end'; // Reset dello stato del dialogo
-
-        if (this.gameState.completed.length === 5) {
-            this.time.delayedCall(500, () => {
-                this.scene.start('VictoryScene', { finalScore: this.gameState.score });
-                this.gameScene.sound.get('bgm').stop();
-                this.gameScene.footstepsSound.stop();
-            });
-        }
-    }
-
-    typewriteText(text) {
-        this.dialogText.setText('');
-        let i = 0;
         this.time.addEvent({
-            callback: () => {
-                this.dialogText.setText(text.substring(0, i));
-                i++;
-            },
-            repeat: text.length - 1,
-            delay: 30, // Velocità di scrittura
-            callbackScope: this
+            delay: 3000,
+            callback: this.movePhilosophers,
+            callbackScope: this,
+            loop: true
         });
+    }
+
+    movePhilosophers() {
+        if (this.dialogActive) return;
+        const speed = 30;
+        this.philosophers.getChildren().forEach(philosopher => {
+            const randNumber = Phaser.Math.Between(0, 5);
+            switch (randNumber) {
+                case 0: philosopher.setVelocity(0, -speed); break;
+                case 1: philosopher.setVelocity(speed, 0); break;
+                case 2: philosopher.setVelocity(0, speed); break;
+                case 3: philosopher.setVelocity(-speed, 0); break;
+                default: philosopher.setVelocity(0, 0); break;
+            }
+        });
+    }
+
+    update() {
+        this.philosophers.getChildren().forEach(philosopher => {
+            if (philosopher.nameLabel) {
+                let labelX = philosopher.x;
+                const labelWidth = philosopher.nameLabel.width / 2;
+                if (labelX - labelWidth < 0) {
+                    labelX = labelWidth;
+                } else if (labelX + labelWidth > this.physics.world.bounds.width) {
+                    labelX = this.physics.world.bounds.width - labelWidth;
+                }
+                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
+            }
+        });
+
+        if (this.dialogActive) {
+            this.player.setVelocity(0);
+            this.philosophers.setVelocity(0, 0);
+            if (!this.footstepsSound.isPaused) {
+                this.footstepsSound.pause();
+            }
+            return;
+        }
+
+        const playerSpeed = 200;
+        this.player.setVelocity(0);
+
+        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
+        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
+
+        const isMoving = this.player.body.velocity.length() > 0;
+        if (isMoving && this.footstepsSound.isPaused) {
+            this.footstepsSound.resume();
+        } 
+        else if (!isMoving && !this.footstepsSound.isPaused) {
+            this.footstepsSound.pause();
+        }
+
+        let canInteractWith = null;
+        for (const philosopher of this.philosophers.getChildren()) {
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
+            if (distance < 100) {
+                canInteractWith = philosopher;
+                break;
+            }
+        }
+        
+        this.events.emit('interactionUpdate', canInteractWith);
+
+        if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+            this.dialogActive = true;
+            this.events.emit('startDialog', canInteractWith.name);
+        }
     }
 }
