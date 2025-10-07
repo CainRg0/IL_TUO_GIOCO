@@ -2,29 +2,36 @@ class GameScene extends Phaser.Scene {
     constructor() { super('GameScene'); }
 
     create() {
-        // --- SFONDO MODIFICATO ---
-        this.add.image(400, 300, 'game_bg').setDepth(-1);
+        // --- CREAZIONE DELLA MAPPA CORRETTA ---
+        const map = this.make.tilemap({ key: 'map' });
+        // Usa 'boh' (dal JSON) e 'tiles' (dal Preloader)
+        const tileset = map.addTilesetImage('boh', 'tiles'); 
 
-        this.cameras.main.fadeIn(500, 0, 0, 0);
+        // Usa i nomi dei layer in minuscolo, come nel file JSON
+        const pavimentoLayer = map.createLayer('pavimento', tileset, 0, 0);
+        const varieLayer = map.createLayer('varie', tileset, 0, 0);
+        const muriLayer = map.createLayer('muri', tileset, 0, 0);
 
-        this.player = this.physics.add.sprite(100, 300, 'player');
-        this.player.setCollideWorldBounds(true);
+        // --- FISICA E COLLISIONI ---
+        muriLayer.setCollisionByExclusion([-1]); // Rende solidi tutti i tile del layer 'muri'
+
+        this.player = this.physics.add.sprite(400, 500, 'player');
         this.player.setScale(0.1);
+        this.player.setCollideWorldBounds(true);
+        this.physics.add.collider(this.player, muriLayer);
 
-        this.philosophers = this.physics.add.group({
-            collideWorldBounds: true,
-        });
+        // --- FILOSOFI ---
+        this.philosophers = this.physics.add.group();
         const philosopherData = [
-            { key: 'platone', x: 150, y: 150, scale: 0.2 },
-            { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
-            { key: 'diogene', x: 650, y: 150, scale: 0.2 },
-            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
-            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
+            { key: 'platone', x: 200, y: 450, scale: 0.2 },
+            { key: 'aristotele', x: 600, y: 450, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 480, scale: 0.2 },
+            { key: 'socrate', x: 150, y: 500, scale: 0.2 },
+            { key: 'pitagora', x: 650, y: 500, scale: 0.15 }
         ];
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key).setScale(data.scale).setName(data.key);
-            philosopher.body.setCircle(philosopher.width / 2 * 0.8);
-            philosopher.body.setImmovable(true);
+            philosopher.body.setCircle(philosopher.width / 2 * 0.8).setImmovable(true).setCollideWorldBounds(true);
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, { fontSize: '14px', fill: '#ffffff', fontFamily: '"Cinzel", serif', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
             philosopher.nameLabel = label;
@@ -32,15 +39,15 @@ class GameScene extends Phaser.Scene {
         
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers);
-        
+        this.physics.add.collider(this.philosophers, muriLayer);
+
+        // --- IL RESTO DEL CODICE RESTA INVARIATO ---
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-
         if (!this.sound.get('bgm')) { this.sound.play('bgm', { loop: true, volume: 0.4 }); }
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
         this.footstepsSound.play();
         this.footstepsSound.pause();
-
         this.time.addEvent({ delay: 3000, callback: this.movePhilosophers, callbackScope: this, loop: true });
     }
 
