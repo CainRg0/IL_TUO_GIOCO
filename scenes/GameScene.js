@@ -9,27 +9,26 @@ class GameScene extends Phaser.Scene {
         
         const walls = this.physics.add.staticGroup();
 
-        // --- BARRIERE INVISIBILI AGGIORNATE ---
-        // Ho provato a stimare le posizioni e le dimensioni basandomi sull'immagine che mi hai dato
-        // Potrebbe essere necessario un fine-tuning da parte tua, giocando con x, y, width, height
+        // --- BARRIERE INVISIBILI AGGIORNATE (Meno restrittive) ---
+        // Queste barriere mirano a coprire solo i bordi esterni della stanza visibile,
+        // lasciando il più spazio possibile al centro.
         
-        // Barriera SUPERIORE (Sotto i capitelli delle colonne)
-        walls.create(400, 150).setSize(800, 40).setVisible(false); 
+        // Barriera SUPERIORE: Lungo il bordo superiore del pavimento, sotto le teste dei filosofi
+        // Un po' più in basso per permettere di camminare più su.
+        walls.create(400, 160).setSize(800, 20).setVisible(false); 
         
-        // Barriera INFERIORE (Sopra il bordo inferiore visibile del pavimento)
-        walls.create(400, 560).setSize(800, 40).setVisible(false); 
+        // Barriera INFERIORE: Lungo il bordo inferiore del pavimento
+        walls.create(400, 560).setSize(800, 20).setVisible(false); 
         
-        // Barriera SINISTRA (Blocca le colonne a sinistra)
-        walls.create(110, 350).setSize(40, 400).setVisible(false); // Colonna sinistra + poco spazio
+        // Barriera SINISTRA: Copre le colonne di sinistra
+        walls.create(100, 360).setSize(20, 400).setVisible(false); 
         
-        // Barriera DESTRA (Blocca le colonne a destra)
-        walls.create(690, 350).setSize(40, 400).setVisible(false); // Colonna destra + poco spazio
+        // Barriera DESTRA: Copre le colonne di destra
+        walls.create(700, 360).setSize(20, 400).setVisible(false); 
         
-        // Barriere INTERMEDIE (se ci sono elementi centrali che bloccano, ad esempio tra le colonne centrali)
-        // Dalla tua immagine, sembra che ci siano colonne più al centro.
-        // Aggiungo due barriere per queste colonne centrali (regola se necessario)
-        walls.create(280, 350).setSize(40, 300).setVisible(false); // Colonna centrale sinistra
-        walls.create(520, 350).setSize(40, 300).setVisible(false); // Colonna centrale destra
+        // Ho rimosso le barriere centrali che causavano il blocco.
+        // Se ci sono altre colonne centrali che devono bloccare, dovremo aggiungerle con precisione,
+        // ma per ora concentriamoci sulla libertà di movimento.
 
         // --- FINE BARRIERE INVISIBILI AGGIORNATE ---
 
