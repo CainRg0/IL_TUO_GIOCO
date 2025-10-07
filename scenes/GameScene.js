@@ -4,27 +4,26 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Aggiunge l'immagine di sfondo
         this.add.image(400, 300, 'game_bg').setDepth(-1);
-
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        this.player = this.physics.add.sprite(100, 300, 'player');
-        // --- MODIFICATO: Il giocatore si scontra con i bordi del mondo di gioco ---
+        // --- POSIZIONE DEL GIOCATORE MODIFICATA ---
+        // x: 400 (centro orizzontale), y: 550 (in basso)
+        this.player = this.physics.add.sprite(400, 550, 'player');
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
 
         this.philosophers = this.physics.add.group({
-            // --- MODIFICATO: Anche i filosofi si scontrano con i bordi del mondo ---
             collideWorldBounds: true,
         });
 
+        // Posizioni dei filosofi leggermente aggiustate
         const philosopherData = [
-            { key: 'platone', x: 250, y: 250, scale: 0.2 },
-            { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
-            { key: 'diogene', x: 400, y: 220, scale: 0.2 },
-            { key: 'socrate', x: 200, y: 400, scale: 0.2 },
-            { key: 'pitagora', x: 600, y: 400, scale: 0.15 }
+            { key: 'platone', x: 200, y: 180, scale: 0.2 },
+            { key: 'aristotele', x: 600, y: 180, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 200, scale: 0.2 },
+            { key: 'socrate', x: 150, y: 400, scale: 0.2 },
+            { key: 'pitagora', x: 650, y: 400, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
@@ -47,7 +46,6 @@ class GameScene extends Phaser.Scene {
             philosopher.nameLabel = label;
         });
         
-        // La collisione con i muri invisibili è stata rimossa
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers);
         
