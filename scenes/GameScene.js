@@ -1,18 +1,38 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
-        this.isPlayerBlocked = false; // Solo il giocatore è bloccato durante il dialogo
+        this.isPlayerBlocked = false;
     }
 
     create() {
         this.add.image(400, 300, 'game_bg').setDepth(-1);
         
         const walls = this.physics.add.staticGroup();
-        walls.create(400, 80).setSize(800, 160).setVisible(false);
-        walls.create(80, 300).setSize(160, 600).setVisible(false);
-        walls.create(720, 300).setSize(160, 600).setVisible(false);
-        walls.create(400, 580).setSize(800, 40).setVisible(false);
+
+        // --- BARRIERE INVISIBILI AGGIORNATE ---
+        // Ho provato a stimare le posizioni e le dimensioni basandomi sull'immagine che mi hai dato
+        // Potrebbe essere necessario un fine-tuning da parte tua, giocando con x, y, width, height
         
+        // Barriera SUPERIORE (Sotto i capitelli delle colonne)
+        walls.create(400, 150).setSize(800, 40).setVisible(false); 
+        
+        // Barriera INFERIORE (Sopra il bordo inferiore visibile del pavimento)
+        walls.create(400, 560).setSize(800, 40).setVisible(false); 
+        
+        // Barriera SINISTRA (Blocca le colonne a sinistra)
+        walls.create(110, 350).setSize(40, 400).setVisible(false); // Colonna sinistra + poco spazio
+        
+        // Barriera DESTRA (Blocca le colonne a destra)
+        walls.create(690, 350).setSize(40, 400).setVisible(false); // Colonna destra + poco spazio
+        
+        // Barriere INTERMEDIE (se ci sono elementi centrali che bloccano, ad esempio tra le colonne centrali)
+        // Dalla tua immagine, sembra che ci siano colonne più al centro.
+        // Aggiungo due barriere per queste colonne centrali (regola se necessario)
+        walls.create(280, 350).setSize(40, 300).setVisible(false); // Colonna centrale sinistra
+        walls.create(520, 350).setSize(40, 300).setVisible(false); // Colonna centrale destra
+
+        // --- FINE BARRIERE INVISIBILI AGGIORNATE ---
+
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
         this.player = this.physics.add.sprite(400, 550, 'player'); 
@@ -76,7 +96,6 @@ class GameScene extends Phaser.Scene {
 
         this.events.on('endDialog', () => {
             this.isPlayerBlocked = false; 
-            // Re-inizializza il movimento casuale per tutti i filosofi
             this.philosophers.getChildren().forEach(p => p.setVelocity(0)); 
             this.movePhilosophers(); 
         });
@@ -85,12 +104,10 @@ class GameScene extends Phaser.Scene {
     movePhilosophers() {
         const speed = 30;
         this.philosophers.getChildren().forEach(philosopher => {
-            // Se il filosofo è quello con cui si sta interagendo, lo ferma
             if (this.scene.get('UIScene').currentPhilosopher === philosopher.name) {
                 philosopher.setVelocity(0, 0); 
                 return; 
             }
-            // Altrimenti, lo muove casualmente
             const randNumber = Phaser.Math.Between(0, 5);
             switch (randNumber) {
                 case 0: philosopher.setVelocity(0, -speed); break;
@@ -146,7 +163,7 @@ class GameScene extends Phaser.Scene {
         this.events.emit('interactionUpdate', canInteractWith);
 
         if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey) && !this.isPlayerBlocked) {
-            this.isPlayerBlocked = true; // Blocca il movimento del giocatore
+            this.isPlayerBlocked = true; 
             this.events.emit('startDialog', canInteractWith.name);
         }
     }
