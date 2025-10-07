@@ -1,15 +1,18 @@
 class UIScene extends Phaser.Scene {
     constructor() {
         super('UIScene');
+        this.currentPhilosopher = null; // Il filosofo con cui si sta interagendo (nome)
+        this.currentQuestionIndex = 0; // Nuova variabile per tenere traccia della domanda corrente
+        this.dialogState = 'dialog'; 
+        this.questionsAnsweredCount = 0; // Contatore globale di quiz risolti correttamente
     }
 
     create() {
         this.gameScene = this.scene.get('GameScene'); 
         
-        // --- MODIFICA COLORE E TESTO DI STATO ---
         this.statusText = this.add.text(20, 20, '', { 
             fontSize: '18px', 
-            fill: '#ffffff', // Colore bianco
+            fill: '#ffffff', 
             fontStyle: 'bold', 
             fontFamily: '"Cinzel", serif' 
         });
@@ -45,49 +48,137 @@ class UIScene extends Phaser.Scene {
         this.dialogButton.on('pointerover', () => this.dialogButton.setStyle({ fill: '#ffff99' }));
         this.dialogButton.on('pointerout', () => this.dialogButton.setStyle({ fill: '#ffffff' }));
 
+        // --- MODIFICA CHIAVE: STRUTTURA DATI DEI QUIZ CON PIU' DOMANDE ---
         this.quizData = {
             platone: {
-                question: "Platone: Qual è l'essenza della realtà?",
-                options: ["Le Idee eterne", "La materia in continuo mutamento", "Le sensazioni individuali"],
-                correct: "Le Idee eterne",
-                dialog: "Ah, il mondo delle idee... la vera essenza della realtà è lì, oltre i sensi. Hai capito bene, giovane studente."
+                initialDialog: "Ciao! Sono Platone. Sei pronto a mettere alla prova la tua saggezza?",
+                questions: [
+                    {
+                        question: "Qual è l'essenza della realtà?",
+                        options: ["Le Idee eterne", "La materia in continuo mutamento", "Le sensazioni individuali"],
+                        correct: "Le Idee eterne",
+                        dialogOnCorrect: "Ah, il mondo delle idee... la vera essenza della realtà è lì, oltre i sensi. Hai capito bene, giovane studente."
+                    },
+                    {
+                        question: "Cosa intendeva Platone con 'Mito della Caverna'?",
+                        options: ["Una spiegazione dell'origine del fuoco", "Un'allegoria sulla conoscenza e l'ignoranza", "Una storia per bambini"],
+                        correct: "Un'allegoria sulla conoscenza e l'ignoranza",
+                        dialogOnCorrect: "Eccellente! Il mito della caverna è la mia metafora per il percorso della conoscenza che porta dalla percezione sensibile all'intellegibile."
+                    },
+                    {
+                        question: "Qual è la forma di governo ideale secondo Platone?",
+                        options: ["Democrazia", "Tirannia", "Repubblica governata dai filosofi-re"],
+                        correct: "Repubblica governata dai filosofi-re",
+                        dialogOnCorrect: "Perfetto! Solo i filosofi, con la loro saggezza e conoscenza del Bene, possono guidare la polis verso la giustizia."
+                    }
+                ]
             },
             aristotele: {
-                question: "Aristotele: Cosa si intende per 'entelechia'?",
-                options: ["Il puro atto", "Il fine immanente di ogni cosa", "La negazione della materia"],
-                correct: "Il fine immanente di ogni cosa",
-                dialog: "Esatto! L'entelechia è il principio che porta ogni essere a realizzare la propria forma perfetta. La tua mente è acuta."
+                initialDialog: "Ciao! Sono Aristotele. Sei pronto a mettere alla prova la tua saggezza?",
+                questions: [
+                    {
+                        question: "Cosa si intende per 'entelechia'?",
+                        options: ["Il puro atto", "Il fine immanente di ogni cosa", "La negazione della materia"],
+                        correct: "Il fine immanente di ogni cosa",
+                        dialogOnCorrect: "Esatto! L'entelechia è il principio che porta ogni essere a realizzare la propria forma perfetta. La tua mente è acuta."
+                    },
+                    {
+                        question: "Qual è il rapporto tra materia e forma?",
+                        options: ["Sono la stessa cosa", "La forma è la disposizione della materia", "La materia è superiore alla forma"],
+                        correct: "La forma è la disposizione della materia",
+                        dialogOnCorrect: "Hai colto nel segno! Ogni cosa è un sinolo di materia e forma, inseparabili nella sostanza individuale."
+                    },
+                    {
+                        question: "Cos'è la 'giusta misura' (mesotes) per Aristotele?",
+                        options: ["Un eccesso di virtù", "La virtù che sta a metà tra due estremi", "La mancanza di coraggio"],
+                        correct: "La virtù che sta a metà tra due estremi",
+                        dialogOnCorrect: "Sì! La virtù risiede nella medietà, evitando eccessi e difetti. È la via della saggezza pratica."
+                    }
+                ]
             },
             diogene: {
-                question: "Diogene: Qual è il fondamento della felicità secondo me?",
-                options: ["La ricchezza materiale", "Il piacere sensoriale", "L'autosufficienza e l'indipendenza"],
-                correct: "L'autosufficienza e l'indipendenza",
-                dialog: "Non c'è nulla di più vero! La vera libertà sta nel non desiderare nulla, nell'essere padroni di se stessi. Ben detto!"
+                initialDialog: "Ciao! Sono Diogene. Sei pronto a mettere alla prova la tua saggezza?",
+                questions: [
+                    {
+                        question: "Qual è il fondamento della felicità secondo me?",
+                        options: ["La ricchezza materiale", "Il piacere sensoriale", "L'autosufficienza e l'indipendenza"],
+                        correct: "L'autosufficienza e l'indipendenza",
+                        dialogOnCorrect: "Non c'è nulla di più vero! La vera libertà sta nel non desiderare nulla, nell'essere padroni di se stessi. Ben detto!"
+                    },
+                    {
+                        question: "Cosa dissi ad Alessandro Magno quando mi chiese cosa desideravo?",
+                        options: ["Oro e gioielli", "Che si spostasse, perché mi toglieva il sole", "Un posto a corte"],
+                        correct: "Che si spostasse, perché mi toglieva il sole",
+                        dialogOnCorrect: "Ah ah! Un vero filosofo non ha bisogno di nulla, nemmeno dell'ombra di un re. La tua indipendenza è lodevole."
+                    },
+                    {
+                        question: "Perché vivevo in una botte?",
+                        options: ["Per sfuggire ai creditori", "Per dimostrare il disprezzo per le convenzioni sociali", "Per praticare l'agricoltura"],
+                        correct: "Per dimostrare il disprezzo per le convenzioni sociali",
+                        dialogOnCorrect: "Esatto! Per vivere in accordo con la natura, rifiutando gli agi e le ipocrisie della società. Ottima osservazione!"
+                    }
+                ]
             },
             socrate: {
-                question: "Socrate: Qual è il principio fondamentale del mio pensiero?",
-                options: ["Conosci te stesso", "La materia è eterna", "Il dubbio universale"],
-                correct: "Conosci te stesso",
-                dialog: "Saggezza pura! La conoscenza di sé è la chiave per una vita virtuosa. La tua anima ha sete di sapere."
+                initialDialog: "Ciao! Sono Socrate. Sei pronto a mettere alla prova la tua saggezza?",
+                questions: [
+                    {
+                        question: "Qual è il principio fondamentale del mio pensiero?",
+                        options: ["Conosci te stesso", "La materia è eterna", "Il dubbio universale"],
+                        correct: "Conosci te stesso",
+                        dialogOnCorrect: "Saggezza pura! La conoscenza di sé è la chiave per una vita virtuosa. La tua anima ha sete di sapere."
+                    },
+                    {
+                        question: "Cos'è la 'maieutica'?",
+                        options: ["L'arte di scolpire", "L'arte di far partorire le idee", "Un tipo di retorica persuasiva"],
+                        correct: "L'arte di far partorire le idee",
+                        dialogOnCorrect: "Benissimo! Con il dialogo e le domande, aiuto gli altri a tirar fuori la verità che è già in loro. Hai compreso il mio metodo."
+                    },
+                    {
+                        question: "Perché sono stato condannato a morte?",
+                        options: ["Per furto", "Per corruzione dei giovani e empietà", "Per aver attaccato il governo"],
+                        correct: "Per corruzione dei giovani e empietà",
+                        dialogOnCorrect: "Purtroppo sì. La mia ricerca della verità e l'invito al pensiero critico non furono ben visti da tutti. Ma la verità trionfa sempre."
+                    }
+                ]
             },
             pitagora: {
-                question: "Pitagora: Qual è l'elemento fondamentale dell'universo?",
-                options: ["L'acqua", "Il fuoco", "Il numero"],
-                correct: "Il numero",
-                dialog: "Magnifico! L'intero cosmo è un'armonia di numeri e proporzioni. Hai colto il segreto dell'universo."
+                initialDialog: "Ciao! Sono Pitagora. Sei pronto a mettere alla prova la tua saggezza?",
+                questions: [
+                    {
+                        question: "Qual è l'elemento fondamentale dell'universo?",
+                        options: ["L'acqua", "Il fuoco", "Il numero"],
+                        correct: "Il numero",
+                        dialogOnCorrect: "Magnifico! L'intero cosmo è un'armonia di numeri e proporzioni. Hai colto il segreto dell'universo."
+                    },
+                    {
+                        question: "Quale importante teorema geometrico è attribuito a me?",
+                        options: ["Il teorema di Talete", "Il teorema di Euclide", "Il teorema di Pitagora"],
+                        correct: "Il teorema di Pitagora",
+                        dialogOnCorrect: "Certo! La relazione tra i lati di un triangolo rettangolo, una delle pietre angolari della geometria. Eccellente."
+                    },
+                    {
+                        question: "La mia scuola era anche una comunità basata su cosa?",
+                        options: ["Il commercio", "Regole etiche, religiose e scientifiche", "L'arte drammatica"],
+                        correct: "Regole etiche, religiose e scientifiche",
+                        dialogOnCorrect: "Perfetto! Non solo filosofia e matematica, ma anche uno stile di vita e una ricerca della purificazione dell'anima. La tua conoscenza è vasta."
+                    }
+                ]
             }
         };
 
         this.gameState = { 
-            completed: [], 
+            completed: [], // Mantiene i nomi dei filosofi le cui 3 domande sono state completate
             score: 0 
         };
-        this.currentPhilosopher = null; 
-        this.dialogState = 'dialog'; 
+        // this.currentPhilosopher e this.currentQuestionIndex sono già dichiarati nel costruttore
+        // this.dialogState è già dichiarato nel costruttore
+        // this.questionsAnsweredCount è già dichiarato nel costruttore
 
         this.updateStatusText();
 
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
+            // Mostra/nascondi il testo di interazione solo se il giocatore non è bloccato e il filosofo non è già completato
             if (!this.gameScene.isPlayerBlocked && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
             } else { 
@@ -100,12 +191,22 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        // --- MODIFICA TESTO DI STATO ---
-        this.statusText.setText(`Quiz Risolti: ${this.gameState.completed.length}/5\nRispondi a tutti i filosofi per vincere!`);
+        this.statusText.setText(`Quiz Risolti: ${this.questionsAnsweredCount}/15\nRispondi a tutti i filosofi per vincere!`);
     }
 
     startDialog(philosopherName) {
         this.currentPhilosopher = philosopherName;
+        // Resetta l'indice della domanda solo se è una nuova conversazione con questo filosofo
+        if (!this.gameState.completed.includes(philosopherName)) {
+            this.currentQuestionIndex = 0; 
+        } else {
+            // Se il filosofo è già completato, non fare nulla o mostra un messaggio "già completato"
+            // Per ora, semplicemente termina il dialogo
+            this.gameScene.events.emit('endDialog'); // Sblocca il giocatore
+            return;
+        }
+
+
         this.dialogState = 'dialog';
 
         const philosopherSprite = this.gameScene.philosophers.getChildren().find(p => p.name === philosopherName);
@@ -123,30 +224,40 @@ class UIScene extends Phaser.Scene {
             this.optionsButtons = null;
         }
 
-        const initialDialog = `Ciao! Sono ${philosopherName}. Sei pronto a mettere alla prova la tua saggezza?`;
-        this.typewriteText(initialDialog);
+        // Mostra il dialogo iniziale del filosofo
+        this.typewriteText(this.quizData[this.currentPhilosopher].initialDialog);
 
         this.dialogButton.off('pointerdown'); 
         this.dialogButton.on('pointerdown', () => this.nextDialog());
     }
 
     nextDialog() {
-        if (this.dialogState === 'dialog') {
-            this.showQuiz();
-        } else if (this.dialogState === 'result') {
-            this.endDialog(); 
+        // Se siamo nel dialogo iniziale o nella risposta all'ultima domanda
+        if (this.dialogState === 'dialog' || this.dialogState === 'result') {
+            if (this.currentQuestionIndex < this.quizData[this.currentPhilosopher].questions.length) {
+                // Se ci sono ancora domande, mostra la prossima
+                this.showQuiz(this.currentPhilosopher, this.currentQuestionIndex);
+            } else {
+                // Tutte le domande per questo filosofo sono state risposte
+                this.endPhilosopherDialog();
+            }
         }
     }
 
-    showQuiz() {
+    showQuiz(philosopherName, questionIndex) {
         this.dialogState = 'quiz';
         this.dialogButton.setVisible(false); 
-        const quiz = this.quizData[this.currentPhilosopher];
-        this.typewriteText(quiz.question);
+        const currentQuiz = this.quizData[philosopherName].questions[questionIndex];
+        this.typewriteText(currentQuiz.question);
+
+        if (this.optionsButtons) {
+            this.optionsButtons.forEach(btn => btn.destroy());
+            this.optionsButtons = null;
+        }
 
         this.optionsButtons = [];
         let yOffset = 460;
-        quiz.options.forEach(option => {
+        currentQuiz.options.forEach(option => {
             const optionBtn = this.add.text(70, yOffset, `- ${option}`, {
                 fontSize: '18px', 
                 fill: '#fff', 
@@ -158,7 +269,7 @@ class UIScene extends Phaser.Scene {
 
             optionBtn.on('pointerover', () => optionBtn.setStyle({ fill: '#ffff99', backgroundColor: '#4a4a4a' }));
             optionBtn.on('pointerout', () => optionBtn.setStyle({ fill: '#ffffff', backgroundColor: '#1a1a1a' }));
-            optionBtn.on('pointerdown', () => this.checkAnswer(option, quiz.correct, quiz.dialog));
+            optionBtn.on('pointerdown', () => this.checkAnswer(option, currentQuiz.correct, currentQuiz.dialogOnCorrect));
             this.optionsButtons.push(optionBtn);
             yOffset += optionBtn.height + 5; 
         });
@@ -173,20 +284,22 @@ class UIScene extends Phaser.Scene {
 
         this.dialogButton.setVisible(true).setText('Continua'); 
         this.dialogButton.off('pointerdown');
-        this.dialogButton.on('pointerdown', () => this.endDialog()); 
+        this.dialogButton.on('pointerdown', () => this.nextDialog()); // Dopo la risposta, si va alla prossima domanda o si conclude
 
         if (selectedOption === correctAnswer) {
             this.gameState.score++;
+            this.questionsAnsweredCount++; // Incrementa il contatore globale delle domande risposte
             this.sound.play('correct_sfx');
             this.typewriteText("Corretto!\n" + dialogOnCorrect);
         } else {
             this.sound.play('wrong_sfx');
             this.typewriteText("Sbagliato. La risposta corretta era: " + correctAnswer);
         }
+        this.currentQuestionIndex++; // Incrementa l'indice della domanda per la prossima volta
         this.updateStatusText();
     }
 
-    endDialog() {
+    endPhilosopherDialog() {
         this.dialogBox.setVisible(false);
         this.dialogText.setVisible(false);
         this.dialogButton.setVisible(false);
@@ -196,16 +309,16 @@ class UIScene extends Phaser.Scene {
             this.optionsButtons = null;
         }
 
-        if (!this.gameState.completed.includes(this.currentPhilosopher) && this.dialogState === 'result') {
+        // Segna il filosofo come completato solo se tutte le sue domande sono state poste
+        if (!this.gameState.completed.includes(this.currentPhilosopher)) {
             this.gameState.completed.push(this.currentPhilosopher);
-            this.updateStatusText();
         }
 
         this.currentPhilosopher = null;
-        this.gameScene.events.emit('endDialog'); 
+        this.gameScene.events.emit('endDialog'); // Sblocca il giocatore nella GameScene
         this.dialogState = 'end'; 
 
-        if (this.gameState.completed.length === 5) {
+        if (this.gameState.completed.length === 5) { // Controlla se tutti e 5 i filosofi sono stati completati
             this.time.delayedCall(500, () => {
                 this.scene.start('VictoryScene', { finalScore: this.gameState.score });
                 this.gameScene.sound.get('bgm').stop();
