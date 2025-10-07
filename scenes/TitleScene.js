@@ -36,7 +36,7 @@ class TitleScene extends Phaser.Scene {
         this.loreGroup = this.add.group();
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-        const loreTextContent = [ 'L\'Affresco: La Scuola di Atene', '', 'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane...', '', 'Significato e Personaggi', 'Al centro, Platone punta verso l\'alto, mentre Aristotele indica il basso. Nel gioco incontri anche:', '• Socrate', '• Pitagora', '• Diogene' ];
+        const loreTextContent = [ 'L\'Affresco: La Scuola di Atene', '', 'Opera di Raffaello Sanzio (1509-1511)...', '', 'Significato e Personaggi', 'Al centro, Platone punta verso l\'alto...', '• Socrate', '• Pitagora', '• Diogene' ];
         const text = this.add.text(570, 100, loreTextContent, { fontSize: '18px', fill: '#000000', fontStyle: 'bold', align: 'center', wordWrap: { width: 380 }, lineSpacing: 10 }).setOrigin(0.5, 0);
         const closeButton = this.add.text(400, 560, '[ Chiudi ]', { fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
