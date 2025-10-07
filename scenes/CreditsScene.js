@@ -46,7 +46,7 @@ class CreditsScene extends Phaser.Scene {
             // fino a una posizione sopra lo schermo pari all'altezza del testo stesso
             y: -textObject.height,
             // MODIFICATO: Durata ridotta a 25 secondi per velocizzare lo scorrimento
-            duration: 45000,
+            duration: 55000,
             ease: 'Linear',
             onComplete: () => {
                 // Quando i crediti sono finiti, torna al menu principale dopo 2 secondi
@@ -58,4 +58,5 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
 
