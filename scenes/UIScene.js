@@ -4,16 +4,15 @@ class UIScene extends Phaser.Scene {
         this.currentPhilosopher = null; 
         this.currentQuestionIndex = 0; 
         this.dialogState = 'dialog'; 
-        this.questionsAnsweredCount = 0; 
+        this.questionsCorrectInQuiz = 0; // Nuovo contatore per le risposte corrette nel quiz attuale
     }
 
     create() {
         this.gameScene = this.scene.get('GameScene'); 
         
-        // --- COLORE BIANCO E TESTO DI STATO ---
         this.statusText = this.add.text(20, 20, '', { 
             fontSize: '18px', 
-            fill: '#ffffff', // Colore bianco
+            fill: '#ffffff', 
             fontStyle: 'bold', 
             fontFamily: '"Cinzel", serif' 
         });
@@ -168,14 +167,13 @@ class UIScene extends Phaser.Scene {
         };
 
         this.gameState = { 
-            completed: [], 
-            score: 0 
+            completed: [], // Filosofi il cui test è stato superato (2+ risposte corrette)
+            score: 0       // Punteggio totale (non più usato per vittoria, ma utile per VictoryScene)
         };
         
         this.updateStatusText();
 
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            // Mostra/nascondi il testo di interazione solo se il giocatore NON è bloccato e il filosofo non è già completato
             if (!this.gameScene.isPlayerBlocked && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
             } else { 
@@ -188,17 +186,18 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        this.statusText.setText(`Quiz Risolti: ${this.questionsAnsweredCount}/15\nRispondi a tutti i filosofi per vincere!`);
+        this.statusText.setText(`Test Risolti: ${this.gameState.completed.length}/5\nRispondi a tutti i filosofi per vincere!`);
     }
 
     startDialog(philosopherName) {
         this.currentPhilosopher = philosopherName;
-        // Resetta l'indice della domanda solo se è una nuova conversazione con questo filosofo
-        if (!this.gameState.completed.includes(philosopherName)) {
-            this.currentQuestionIndex = 0; 
-        } else {
-            // Se il filosofo è già completato, mostra un messaggio e termina subito
-            this.typewriteText(`Hai già risposto a tutte le domande di ${philosopherName}. Ottimo lavoro!`);
+        
+        // Resetta i contatori per il nuovo quiz
+        this.currentQuestionIndex = 0; 
+        this.questionsCorrectInQuiz = 0; // Inizia un nuovo quiz, resetta le risposte corrette
+
+        if (this.gameState.completed.includes(philosopherName)) {
+            this.typewriteText(`Hai già superato il test di ${philosopherName}. Ottimo lavoro!`);
             this.dialogBox.setVisible(true);
             this.dialogText.setVisible(true);
             this.dialogButton.setVisible(true).setText('Continua');
@@ -208,9 +207,6 @@ class UIScene extends Phaser.Scene {
         }
 
         this.dialogState = 'dialog';
-
-        // Il filosofo specifico viene fermato nella GameScene tramite 'currentPhilosopher'
-        // Non serve fermarlo qui direttamente, ma è importante che currentPhilosopher sia impostato
 
         this.dialogBox.setVisible(true);
         this.dialogText.setVisible(true);
@@ -234,7 +230,7 @@ class UIScene extends Phaser.Scene {
             if (this.currentQuestionIndex < this.quizData[this.currentPhilosopher].questions.length) {
                 this.showQuiz(this.currentPhilosopher, this.currentQuestionIndex);
             } else {
-                this.endPhilosopherDialog();
+                this.evaluateAndEndPhilosopherDialog(); // Chiamata al nuovo metodo di valutazione
             }
         }
     }
@@ -243,7 +239,6 @@ class UIScene extends Phaser.Scene {
         this.dialogState = 'quiz';
         this.dialogButton.setVisible(false); 
         
-        // --- RIMUOVE I PULSANTI DELLE OPZIONI PRECEDENTI ---
         if (this.optionsButtons) {
             this.optionsButtons.forEach(btn => btn.destroy());
             this.optionsButtons = null;
@@ -275,7 +270,6 @@ class UIScene extends Phaser.Scene {
     checkAnswer(selectedOption, correctAnswer, dialogOnCorrect) {
         this.dialogState = 'result';
         
-        // --- FAI SCOMPARIRE I PULSANTI DELLE RISPOSTE SUBITO ---
         if (this.optionsButtons) {
             this.optionsButtons.forEach(btn => btn.destroy());
             this.optionsButtons = null;
@@ -286,8 +280,8 @@ class UIScene extends Phaser.Scene {
         this.dialogButton.on('pointerdown', () => this.nextDialog()); 
 
         if (selectedOption === correctAnswer) {
-            this.gameState.score++;
-            this.questionsAnsweredCount++; 
+            this.gameState.score++; // Punteggio totale (per VictoryScene)
+            this.questionsCorrectInQuiz++; // Incrementa solo per il quiz corrente
             this.sound.play('correct_sfx');
             this.typewriteText("Corretto!\n" + dialogOnCorrect);
         } else {
@@ -295,7 +289,31 @@ class UIScene extends Phaser.Scene {
             this.typewriteText("Sbagliato. La risposta corretta era: " + correctAnswer);
         }
         this.currentQuestionIndex++; 
-        this.updateStatusText();
+    }
+
+    // --- NUOVO METODO: Valuta il quiz e poi termina il dialogo ---
+    evaluateAndEndPhilosopherDialog() {
+        let finalMessage = "";
+        if (this.questionsCorrectInQuiz >= 2) { // 2 su 3 risposte corrette
+            finalMessage = `Complimenti! Hai risposto correttamente a ${this.questionsCorrectInQuiz} su 3 domande. Hai superato il test di ${this.currentPhilosopher}!`;
+            if (!this.gameState.completed.includes(this.currentPhilosopher)) {
+                this.gameState.completed.push(this.currentPhilosopher);
+            }
+        } else {
+            finalMessage = `Peccato! Hai risposto correttamente a ${this.questionsCorrectInQuiz} su 3 domande. Non hai superato il test di ${this.currentPhilosopher}. Riprova più tardi!`;
+            // Se non ha superato, lo rimuove dai completati se per qualche motivo ci fosse
+            const index = this.gameState.completed.indexOf(this.currentPhilosopher);
+            if (index > -1) {
+                this.gameState.completed.splice(index, 1);
+            }
+        }
+        
+        this.typewriteText(finalMessage);
+        this.updateStatusText(); // Aggiorna lo stato dopo la valutazione
+        
+        this.dialogButton.off('pointerdown');
+        this.dialogButton.on('pointerdown', () => this.endPhilosopherDialog());
+        this.dialogButton.setVisible(true).setText('Ok');
     }
 
     endPhilosopherDialog() {
@@ -308,12 +326,7 @@ class UIScene extends Phaser.Scene {
             this.optionsButtons = null;
         }
 
-        if (!this.gameState.completed.includes(this.currentPhilosopher)) {
-            this.gameState.completed.push(this.currentPhilosopher);
-            this.updateStatusText();
-        }
-
-        this.currentPhilosopher = null;
+        this.currentPhilosopher = null; // Rimuove il filosofo corrente
         this.gameScene.events.emit('endDialog'); 
         this.dialogState = 'end'; 
 
