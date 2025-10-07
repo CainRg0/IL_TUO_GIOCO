@@ -6,15 +6,14 @@ class UIScene extends Phaser.Scene {
     create() {
         this.gameScene = this.scene.get('GameScene'); 
         
-        // Testo per lo stato del gioco (es. "Filosofi trovati: 0/5")
+        // --- MODIFICA COLORE E TESTO DI STATO ---
         this.statusText = this.add.text(20, 20, '', { 
             fontSize: '18px', 
-            fill: '#000000', 
+            fill: '#ffffff', // Colore bianco
             fontStyle: 'bold', 
             fontFamily: '"Cinzel", serif' 
         });
 
-        // Testo per l'interazione ([E] Parla)
         this.interactionText = this.add.text(400, 450, '[E] Parla', { 
             fontSize: '20px', 
             fill: '#fff', 
@@ -23,13 +22,11 @@ class UIScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif' 
         }).setOrigin(0.5).setVisible(false);
         
-        // Pannello del dialogo 
         this.dialogBox = this.add.graphics();
         this.dialogBox.fillStyle(0x000000, 0.8)
                       .fillRect(50, 400, 700, 180) 
                       .setVisible(false);
 
-        // Testo del dialogo
         this.dialogText = this.add.text(70, 420, '', { 
             fontSize: '20px', 
             fill: '#fff', 
@@ -37,7 +34,6 @@ class UIScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif' 
         }).setVisible(false);
 
-        // Pulsante per chiudere il dialogo o per la risposta
         this.dialogButton = this.add.text(680, 550, 'Continua', { 
             fontSize: '20px', 
             fill: '#fff', 
@@ -49,7 +45,6 @@ class UIScene extends Phaser.Scene {
         this.dialogButton.on('pointerover', () => this.dialogButton.setStyle({ fill: '#ffff99' }));
         this.dialogButton.on('pointerout', () => this.dialogButton.setStyle({ fill: '#ffffff' }));
 
-        // Dati dei quiz
         this.quizData = {
             platone: {
                 question: "Platone: Qual è l'essenza della realtà?",
@@ -83,19 +78,16 @@ class UIScene extends Phaser.Scene {
             }
         };
 
-        // Stato del gioco (locale alla UIScene)
         this.gameState = { 
             completed: [], 
             score: 0 
         };
-        this.currentPhilosopher = null; // Il filosofo con cui si sta interagendo (nome)
+        this.currentPhilosopher = null; 
         this.dialogState = 'dialog'; 
 
         this.updateStatusText();
 
-        // Eventi dalla GameScene
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            // Mostra/nascondi il testo di interazione solo se il giocatore non è bloccato e il filosofo non è già completato
             if (!this.gameScene.isPlayerBlocked && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
             } else { 
@@ -108,17 +100,17 @@ class UIScene extends Phaser.Scene {
     }
 
     updateStatusText() {
-        this.statusText.setText(`Filosofi Trovati: ${this.gameState.completed.length}/5\nRisposte Corrette: ${this.gameState.score}`);
+        // --- MODIFICA TESTO DI STATO ---
+        this.statusText.setText(`Quiz Risolti: ${this.gameState.completed.length}/5\nRispondi a tutti i filosofi per vincere!`);
     }
 
     startDialog(philosopherName) {
         this.currentPhilosopher = philosopherName;
         this.dialogState = 'dialog';
 
-        // Trova il filosofo nell'array di GameScene e fermalo
         const philosopherSprite = this.gameScene.philosophers.getChildren().find(p => p.name === philosopherName);
         if (philosopherSprite) {
-            philosopherSprite.setVelocity(0, 0); // Ferma il filosofo con cui si parla
+            philosopherSprite.setVelocity(0, 0); 
         }
 
         this.dialogBox.setVisible(true);
@@ -210,7 +202,6 @@ class UIScene extends Phaser.Scene {
         }
 
         this.currentPhilosopher = null;
-        // Emetti l'evento per sbloccare il movimento del giocatore
         this.gameScene.events.emit('endDialog'); 
         this.dialogState = 'end'; 
 
