@@ -6,15 +6,18 @@ class GameScene extends Phaser.Scene {
         const gameWidth = this.sys.game.config.width;
         const gameHeight = this.sys.game.config.height;
 
-        this.add.image(gameWidth / 2, gameHeight / 2, 'game_bg').setDepth(-1).setDisplaySize(gameWidth, gameHeight);
+        this.bgImage = this.add.image(gameWidth / 2, gameHeight / 2, 'game_bg').setDepth(-1).setDisplaySize(gameWidth, gameHeight);
 
-        // Muri invisibili (le coordinate vanno adattate alle nuove dimensioni dinamiche,
-        // per ora li lascio come riferimento, ma potresti voler usare setCollideWorldBounds)
+        // Muri invisibili (questi ora si adattano alla dimensione dello schermo)
         const walls = this.physics.add.staticGroup();
-        walls.create(gameWidth / 2, gameHeight * 0.1).setSize(gameWidth, gameHeight * 0.2).setVisible(false); // Muro superiore
-        walls.create(gameWidth * 0.1, gameHeight / 2).setSize(gameWidth * 0.2, gameHeight).setVisible(false); // Muro sinistro
-        walls.create(gameWidth * 0.9, gameHeight / 2).setSize(gameWidth * 0.2, gameHeight).setVisible(false); // Muro destro
-        walls.create(gameWidth / 2, gameHeight * 0.9).setSize(gameWidth, gameHeight * 0.2).setVisible(false); // Muro inferiore
+        // Muro superiore
+        walls.create(gameWidth / 2, gameHeight * 0.1).setSize(gameWidth, gameHeight * 0.2).setVisible(false); 
+        // Muro sinistro
+        walls.create(gameWidth * 0.1, gameHeight / 2).setSize(gameWidth * 0.2, gameHeight).setVisible(false); 
+        // Muro destro
+        walls.create(gameWidth * 0.9, gameHeight / 2).setSize(gameWidth * 0.2, gameHeight).setVisible(false); 
+        // Muro inferiore
+        walls.create(gameWidth / 2, gameHeight * 0.9).setSize(gameWidth, gameHeight * 0.2).setVisible(false); 
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
@@ -56,13 +59,14 @@ class GameScene extends Phaser.Scene {
 
         if (this.sys.game.isMobile) {
             // Se è mobile, creiamo il joystick
+            // --- MODIFICATO: Usiamo this.plugins.get() ---
             this.joystick = this.plugins.get('rexVirtualJoystick').add(this, {
                 x: gameWidth * 0.15,
                 y: gameHeight * 0.85,
                 radius: 60,
                 base: this.add.circle(0, 0, 60, 0x888888, 0.5),
                 thumb: this.add.circle(0, 0, 30, 0xcccccc, 0.7),
-                forceMin: 16 // Sensibilità minima del joystick
+                forceMin: 16 
             });
             this.cursorKeys = this.joystick.createCursorKeys();
 
@@ -72,8 +76,8 @@ class GameScene extends Phaser.Scene {
                 fill: '#ffffff',
                 backgroundColor: '#333333',
                 padding: { x: 20, y: 15 },
-                borderRadius: 50 // Rendi il pulsante rotondo se lo desideri
-            }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(100).setVisible(false); // Inizialmente invisibile
+                borderRadius: 50 
+            }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(100).setVisible(false); 
             
             this.interactButton.on('pointerdown', () => {
                 if (this.canInteractWith && !this.dialogActive) {
@@ -98,7 +102,7 @@ class GameScene extends Phaser.Scene {
 
         // Evento di resize per adattare gli elementi quando la finestra cambia dimensione
         this.scale.on('resize', this.resize, this);
-        this.resize({ width: gameWidth, height: gameHeight }); // Chiama resize una volta per inizializzare
+        this.resize({ width: gameWidth, height: gameHeight }); 
     }
 
     resize(gameSize) {
@@ -106,22 +110,18 @@ class GameScene extends Phaser.Scene {
         const height = gameSize.height;
         this.cameras.main.setViewport(0, 0, width, height);
 
-        // Adatta lo sfondo
-        this.add.image(width / 2, height / 2, 'game_bg').setDepth(-1).setDisplaySize(width, height);
+        if (this.bgImage) this.bgImage.destroy();
+        this.bgImage = this.add.image(width / 2, height / 2, 'game_bg').setDepth(-1).setDisplaySize(width, height);
 
-        // Adatta il joystick e il pulsante di interazione se mobile
-        if (this.sys.game.isMobile) {
+        this.physics.world.bounds.setTo(0, 0, width, height); 
+
+        if (this.sys.game.isMobile && this.joystick) { // Assicurati che il joystick sia stato creato
             this.joystick.x = width * 0.15;
             this.joystick.y = height * 0.85;
             if (this.interactButton) {
                 this.interactButton.setPosition(width * 0.85, height * 0.85);
             }
         }
-
-        // Adatta le posizioni dei filosofi e del player (solo se necessario, es. se il mondo cambia dimensione)
-        // Per ora li lasciamo statici, ma se vuoi che si riposizionino al resize, dovresti aggiornare le loro x,y qui.
-        // Ad esempio: this.player.setPosition(width / 2, height * 0.8);
-        // E le posizioni dei philosopherData dovrebbero essere ricalcolate.
     }
 
     movePhilosophers() { /* ... non cambia ... */ }
@@ -129,7 +129,6 @@ class GameScene extends Phaser.Scene {
     update() {
         this.philosophers.getChildren().forEach(philosopher => { 
             if (philosopher.nameLabel) {
-                // Riadatta le etichette in base alla posizione del filosofo
                 philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 45);
             }
         });
@@ -138,7 +137,6 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocity(0); 
             this.philosophers.setVelocity(0, 0); 
             if (!this.footstepsSound.isPaused) this.footstepsSound.pause(); 
-            // Su mobile, nascondi il pulsante di interazione durante il dialogo
             if (this.sys.game.isMobile && this.interactButton) {
                 this.interactButton.setVisible(false);
             }
@@ -150,14 +148,12 @@ class GameScene extends Phaser.Scene {
 
         let isMoving = false;
         if (this.sys.game.isMobile && this.cursorKeys) {
-            // Movimento da joystick (mobile)
             if (this.cursorKeys.left.isDown) this.player.setVelocityX(-playerSpeed);
             else if (this.cursorKeys.right.isDown) this.player.setVelocityX(playerSpeed);
             if (this.cursorKeys.up.isDown) this.player.setVelocityY(-playerSpeed);
             else if (this.cursorKeys.down.isDown) this.player.setVelocityY(playerSpeed);
             isMoving = this.player.body.velocity.length() > 0;
         } else if (this.cursors) {
-            // Movimento da tastiera (PC)
             if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
             else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
             if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
@@ -175,11 +171,10 @@ class GameScene extends Phaser.Scene {
                 break;
             }
         }
-        this.canInteractWith = canInteractWith; // Salva per il pulsante touch
+        this.canInteractWith = canInteractWith; 
 
         this.events.emit('interactionUpdate', canInteractWith);
 
-        // Gestione del pulsante di interazione
         if (this.sys.game.isMobile && this.interactButton) {
             if (canInteractWith && !this.dialogActive) {
                 this.interactButton.setVisible(true);
