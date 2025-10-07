@@ -9,26 +9,28 @@ class GameScene extends Phaser.Scene {
         
         const walls = this.physics.add.staticGroup();
 
-        // --- BARRIERE INVISIBILI AGGIORNATE (Meno restrittive) ---
-        // Queste barriere mirano a coprire solo i bordi esterni della stanza visibile,
-        // lasciando il più spazio possibile al centro.
+        // --- BARRIERE INVISIBILI AGGIORNATE (SOLO per i margini esterni) ---
+        // Queste barriere sono posizionate per coprire i bordi esterni della "stanza" visibile
+        // e impedire che i personaggi vadano fuori dallo spazio giocabile.
+        // Ho provato a stimare i bordi più esterni e il "pavimento" visibile nella tua immagine.
         
-        // Barriera SUPERIORE: Lungo il bordo superiore del pavimento, sotto le teste dei filosofi
-        // Un po' più in basso per permettere di camminare più su.
+        // Barriera SUPERIORE: Lungo il bordo superiore del pavimento giocabile.
+        // Impedisce di andare "sopra" le teste dei filosofi e gli sfondi superiori.
         walls.create(400, 160).setSize(800, 20).setVisible(false); 
         
-        // Barriera INFERIORE: Lungo il bordo inferiore del pavimento
+        // Barriera INFERIORE: Lungo il bordo inferiore del pavimento giocabile.
+        // Impedisce di andare "sotto" il bordo della mappa visibile.
         walls.create(400, 560).setSize(800, 20).setVisible(false); 
         
-        // Barriera SINISTRA: Copre le colonne di sinistra
+        // Barriera SINISTRA: Copre il bordo sinistro della mappa.
+        // Impedisce di andare "dietro" le colonne di sinistra.
         walls.create(100, 360).setSize(20, 400).setVisible(false); 
         
-        // Barriera DESTRA: Copre le colonne di destra
+        // Barriera DESTRA: Copre il bordo destro della mappa.
+        // Impedisce di andare "dietro" le colonne di destra.
         walls.create(700, 360).setSize(20, 400).setVisible(false); 
         
-        // Ho rimosso le barriere centrali che causavano il blocco.
-        // Se ci sono altre colonne centrali che devono bloccare, dovremo aggiungerle con precisione,
-        // ma per ora concentriamoci sulla libertà di movimento.
+        // NON CI SONO ALTRE BARRIERE INTERNE. TUTTO LO SPAZIO TRA QUESTE BARRIERE È LIBERO.
 
         // --- FINE BARRIERE INVISIBILI AGGIORNATE ---
 
@@ -43,12 +45,14 @@ class GameScene extends Phaser.Scene {
             collideWorldBounds: true,
         });
 
+        // Ho leggermente modificato le posizioni iniziali dei filosofi per essere più centrali
+        // e lontani dalle barriere, per evitare che vengano bloccati all'inizio.
         const philosopherData = [
-            { key: 'platone', x: 200, y: 180, scale: 0.2 },
-            { key: 'aristotele', x: 600, y: 180, scale: 0.2 },
-            { key: 'diogene', x: 400, y: 200, scale: 0.2 },
-            { key: 'socrate', x: 150, y: 400, scale: 0.2 },
-            { key: 'pitagora', x: 650, y: 400, scale: 0.15 }
+            { key: 'platone', x: 250, y: 250, scale: 0.2 },
+            { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
+            { key: 'diogene', x: 400, y: 280, scale: 0.2 },
+            { key: 'socrate', x: 200, y: 450, scale: 0.2 },
+            { key: 'pitagora', x: 600, y: 450, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
