@@ -34,7 +34,10 @@
             });
             this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
-            // Video e Immagini
+            // --- NUOVA IMMAGINE DI SFONDO ---
+            this.load.image('game_bg', 'assets/img/game_background.jpg');
+
+            // Video e Altre Immagini
             this.load.video('menu_bg_video', 'assets/video/menu_background.mp4', 'loadeddata', false, true);
             this.load.image('platone', 'assets/img/platone.png');
             this.load.image('aristotele', 'assets/img/aristotele.png');
