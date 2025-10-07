@@ -7,33 +7,44 @@ class GameScene extends Phaser.Scene {
     create() {
         this.add.image(400, 300, 'game_bg').setDepth(-1);
         
-        // --- LA SOLUZIONE DEFINITIVA PER LE BARRIERE: SOLO world.bounds PER IL PLAYER ---
-        // Eliminiamo la staticGroup 'walls' e useremo solo i limiti del mondo fisico di Phaser
-        // per bloccare il player. Questi limiti saranno impostati per coincidere con i bordi
-        // dell'area giocabile visibile nella tua immagine.
-        // I filosofi, non avendo 'setCollideWorldBounds(true)', ignoreranno questi limiti.
+        // --- Rimuoviamo i limiti del mondo fisico ---
+        // this.physics.world.setBounds(...) NON viene più usato per le collisioni del player.
 
-        // Le coordinate sono state messe a punto per la tua immagine 800x600:
-        // x: Limite sinistro dell'area giocabile
-        // y: Limite superiore dell'area giocabile (dove il pavimento incontra lo sfondo)
-        // width: Larghezza dell'area giocabile
-        // height: Altezza dell'area giocabile
-        this.physics.world.setBounds(190, 190, 420, 330); // Esempio: 420 = (610-190), 330 = (520-190)
+        const walls = this.physics.add.staticGroup();
 
-        // Rimuoviamo la creazione di 'walls' statiche:
-        // const walls = this.physics.add.staticGroup();
-        // ... e tutti i walls.create(...)
+        // --- BARRIERE INVISIBILI (ORA VISIBILI PER DEBUGGING) ---
+        // Queste barriere ora sono visualizzate in VERDE per aiutarti a capire dove si trovano.
+        // Il player colliderà solo con queste. I filosofi le ignoreranno.
+        // Ho prov provato a dare coordinate che massimizzano lo spazio centrale.
+        
+        // Barriera SUPERIORE (verde)
+        // Coincide con il bordo superiore dell'area del pavimento visibile.
+        walls.create(400, 190).setSize(420, 20).setTint(0x00ff00).setVisible(true); // x, y, width, height
+        
+        // Barriera INFERIORE (verde)
+        // Coincide con il bordo inferiore dell'area del pavimento giocabile (prima del "marciapiede").
+        walls.create(400, 520).setSize(420, 20).setTint(0x00ff00).setVisible(true); 
+        
+        // Barriera SINISTRA (verde)
+        // Coincide con il bordo sinistro dell'area giocabile (colonna interna sinistra).
+        walls.create(190, 350).setSize(20, 330).setTint(0x00ff00).setVisible(true); 
+        
+        // Barriera DESTRA (verde)
+        // Coincide con il bordo destro dell'area giocabile (colonna interna destra).
+        walls.create(610, 350).setSize(20, 330).setTint(0x00ff00).setVisible(true); 
+        
+        // --- FINE BARRIERE ---
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
         this.player = this.physics.add.sprite(400, 480, 'player'); 
         this.player.setScale(0.1);
         
-        // --- IL PLAYER ORA COLLIDE CON I world.bounds ---
-        this.player.setCollideWorldBounds(true);
-        // Rimosso: this.physics.add.collider(this.player, walls);
+        // --- IL PLAYER ORA COLLIDE SOLO CON LE NOSTRE "walls" STATICHE ---
+        this.player.setCollideWorldBounds(false); // Rimuovi il blocco con i limiti del mondo
+        this.physics.add.collider(this.player, walls); // Fai collidere il player con le nostre barriere verdi
 
-        this.philosophers = this.physics.add.group(); // Nessun setCollideWorldBounds(true) per i filosofi
+        this.philosophers = this.physics.add.group(); // I filosofi non hanno limiti del mondo o collisioni con walls
 
         const philosopherData = [
             { key: 'platone', x: 250, y: 300, scale: 0.2 },
@@ -50,8 +61,8 @@ class GameScene extends Phaser.Scene {
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
-            // I filosofi NON collidono con NESSUNA barriera (né 'walls' né 'world.bounds').
-            // Possono muoversi liberamente in tutta l'area del canvas.
+            // I filosofi non collidono con le 'walls', né con i 'world.bounds'.
+            // Sono liberi di vagare ovunque nel canvas 800x600.
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -101,7 +112,6 @@ class GameScene extends Phaser.Scene {
                 return; 
             }
             // I filosofi si muovono casualmente nell'intera area 800x600 del canvas.
-            // Aumentate le opzioni per più movimento e diagonali.
             const randNumber = Phaser.Math.Between(0, 8); 
             switch (randNumber) {
                 case 0: philosopher.setVelocity(0, -speed); break; 
