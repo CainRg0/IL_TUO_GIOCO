@@ -49,11 +49,10 @@ class CreditsScene extends Phaser.Scene {
         this.tweens.add({
             targets: creditsContainer,
             y: -creditsContainer.height, // Scorre fino alla fine
-            duration: 40000,
+            duration: 40000, // Durata di 40 secondi
             ease: 'Linear',
             
-            // --- MODIFICA CHIAVE ---
-            // Alla fine dell'animazione, invece di cambiare scena, crea il pulsante.
+            // Alla fine dell'animazione, crea il pulsante per tornare indietro.
             onComplete: () => {
                 const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
                     fontSize: '24px',
