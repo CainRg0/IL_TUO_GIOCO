@@ -1,13 +1,9 @@
 class CreditsScene extends Phaser.Scene {
-    constructor() {
-        super('CreditsScene');
-    }
-
+    constructor() { super('CreditsScene'); }
     create() {
         this.sound.stopAll();
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
         this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
-
         const creditsTextContent = [
             'Paideia', '(Alla scuola di atene)', '', '',
             'Un Progetto Realizzato Da:', '', '',
@@ -28,13 +24,11 @@ class CreditsScene extends Phaser.Scene {
             'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
-
         const creditsContainer = this.add.container(400, 600);
         const normalStyle = { fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
         let currentY = 0;
         const lineSpacing = 45;
-
         creditsTextContent.forEach(line => {
             let style = normalStyle;
             if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
@@ -44,25 +38,15 @@ class CreditsScene extends Phaser.Scene {
             creditsContainer.add(textLine);
             currentY += lineSpacing;
         });
-
-        // --- LOGICA DI SCORRIMENTO CORRETTA ---
         this.tweens.add({
             targets: creditsContainer,
-            y: -creditsContainer.height, // Fa scorrere l'intero contenitore fino a farlo uscire in alto
-            duration: 30000, // Durata di 30 secondi
+            y: -creditsContainer.height,
+            duration: 30000,
             ease: 'Linear',
-            
-            // onComplete si attiva SOLO quando l'animazione è veramente finita
             onComplete: () => {
-                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
-                    fontSize: '24px',
-                    fill: '#c5a65a',
-                    fontFamily: '"Cinzel", serif'
-                }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
+                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
                 restartButton.on('pointerover', () => restartButton.setStyle({ fill: '#FFFFFF' }));
                 restartButton.on('pointerout', () => restartButton.setStyle({ fill: '#c5a65a' }));
-
                 restartButton.on('pointerdown', () => {
                     this.sound.stopAll();
                     this.cameras.main.fadeOut(500, 0, 0, 0);
