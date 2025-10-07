@@ -1,51 +1,92 @@
-class TitleScene extends Phaser.Scene {
-    constructor() { super('TitleScene'); }
+class GameScene extends Phaser.Scene {
+    constructor() { super('GameScene'); }
+
     create() {
-        const bgVideo = this.add.video(400, 300, 'menu_bg_video');
-        bgVideo.play(true);
-        bgVideo.setDepth(-2);
-        const panel = this.add.graphics();
-        panel.fillStyle(0x000000, 0.9);
-        panel.fillRoundedRect(175, 80, 450, 450, 15);
-        panel.setDepth(-1);
-        this.add.image(400, 320, 'platone').setScale(0.8).setAlpha(0.5).setDepth(0);
-        this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
-        this.menuMusic.play();
-        this.add.text(400, 130, 'Paideia', { fontSize: '72px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setShadow(2, 2, '#000', 4).setDepth(1);
-        this.add.text(400, 210, 'Alla Scuola di Atene', { fontSize: '36px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setShadow(2, 2, '#000', 4).setDepth(1);
-        this.startButton = this.add.text(400, 350, 'Inizia il Viaggio', { fontSize: '32px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
-        this.loreButton = this.add.text(400, 420, 'Lore', { fontSize: '24px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(1);
-        this.creditsButton = this.add.text(750, 560, 'Crediti', { fontSize: '18px', fill: '#c5a65a', fontFamily: '"Cinzel", serif' }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true }).setDepth(1);
-        this.startButton.on('pointerdown', () => this.startGame());
-        this.loreButton.on('pointerdown', () => this.showLore());
-        this.creditsButton.on('pointerdown', () => this.showCredits());
-        [this.startButton, this.loreButton, this.creditsButton].forEach(button => {
-            button.on('pointerover', () => button.setStyle({ fill: '#FFFFFF' }));
-            button.on('pointerout', () => button.setStyle({ fill: '#c5a65a' }));
+        // Aggiungiamo la nuova immagine come sfondo
+        this.add.image(400, 300, 'game_bg').setDepth(-1);
+
+        this.cameras.main.fadeIn(500, 0, 0, 0);
+
+        this.player = this.physics.add.sprite(100, 300, 'player');
+        this.player.setCollideWorldBounds(true);
+        this.player.setScale(0.1);
+
+        this.philosophers = this.physics.add.group({
+            collideWorldBounds: true,
         });
-        this.narratorSound = this.sound.add('narrator');
-        this.createLoreScreen();
-        this.konamiCode = ['ARROWUP', 'ARROWUP', 'ARROWDOWN', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT', 'ARROWLEFT', 'ARROWRIGHT', 'B', 'A'];
-        this.inputKeys = [];
-        this.input.keyboard.on('keydown', this.handleKonamiCode, this);
+        const philosopherData = [
+            { key: 'platone', x: 150, y: 150, scale: 0.2 },
+            { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
+            { key: 'diogene', x: 650, y: 150, scale: 0.2 },
+            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
+            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
+        ];
+        philosopherData.forEach(data => {
+            const philosopher = this.philosophers.create(data.x, data.y, data.key).setScale(data.scale).setName(data.key);
+            philosopher.body.setCircle(philosopher.width / 2 * 0.8);
+            philosopher.body.setImmovable(true);
+            const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
+            const label = this.add.text(philosopher.x, philosopher.y - 45, name, { fontSize: '14px', fill: '#ffffff', fontFamily: '"Cinzel", serif', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
+            philosopher.nameLabel = label;
+        });
+        
+        this.physics.add.collider(this.player, this.philosophers);
+        this.physics.add.collider(this.philosophers, this.philosophers);
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+        if (!this.sound.get('bgm')) { this.sound.play('bgm', { loop: true, volume: 0.4 }); }
+        this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
+        this.footstepsSound.play();
+        this.footstepsSound.pause();
+
+        this.time.addEvent({ delay: 3000, callback: this.movePhilosophers, callbackScope: this, loop: true });
     }
-    startGame() { this.sound.stopAll(); this.cameras.main.fadeOut(500, 0, 0, 0); this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => { this.scene.start('IntroScene'); }); }
-    showCredits() { this.sound.stopAll(); this.cameras.main.fadeOut(500, 0, 0, 0); this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => { this.scene.start('CreditsScene'); }); }
-    showVictory() { this.sound.stopAll(); this.cameras.main.fadeOut(500, 0, 0, 0); this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => { this.scene.start('VictoryScene'); }); }
-    createLoreScreen() {
-        this.loreGroup = this.add.group();
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
-        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-        const loreTextContent = [ 'L\'Affresco: La Scuola di Atene', '', 'Opera di Raffaello Sanzio (1509-1511)...', '', 'Significato e Personaggi', 'Al centro, Platone punta verso l\'alto...', '• Socrate', '• Pitagora', '• Diogene' ];
-        const text = this.add.text(570, 100, loreTextContent, { fontSize: '18px', fill: '#000000', fontStyle: 'bold', align: 'center', wordWrap: { width: 380 }, lineSpacing: 10 }).setOrigin(0.5, 0);
-        const closeButton = this.add.text(400, 560, '[ Chiudi ]', { fontSize: '24px', fill: '#333', fontFamily: '"Cinzel", serif' }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-        closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
-        closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
-        closeButton.on('pointerdown', () => this.hideLore());
-        this.loreGroup.addMultiple([bg, image, text, closeButton]);
-        this.loreGroup.setVisible(false);
+
+    movePhilosophers() {
+        if (this.dialogActive) return;
+        const speed = 30;
+        this.philosophers.getChildren().forEach(philosopher => {
+            const randNumber = Phaser.Math.Between(0, 5);
+            switch (randNumber) {
+                case 0: philosopher.setVelocity(0, -speed); break;
+                case 1: philosopher.setVelocity(speed, 0); break;
+                case 2: philosopher.setVelocity(0, speed); break;
+                case 3: philosopher.setVelocity(-speed, 0); break;
+                default: philosopher.setVelocity(0, 0); break;
+            }
+        });
     }
-    showLore() { this.startButton.setVisible(false); this.loreButton.setVisible(false); this.creditsButton.setVisible(false); this.loreGroup.setVisible(true); if (this.menuMusic.isPlaying) this.menuMusic.pause(); if (this.sound.context.state === 'suspended') { this.sound.context.resume(); } this.narratorSound.play(); }
-    hideLore() { this.loreGroup.setVisible(false); this.startButton.setVisible(true); this.loreButton.setVisible(true); this.creditsButton.setVisible(true); if (this.narratorSound && this.narratorSound.isPlaying) { this.narratorSound.stop(); } if (this.menuMusic.isPaused) this.menuMusic.resume(); }
-    handleKonamiCode(event) { this.inputKeys.push(event.key.toUpperCase()); if (this.inputKeys.length > this.konamiCode.length) this.inputKeys.shift(); if (this.inputKeys.join('') === this.konamiCode.join('')) { this.showVictory(); } }
+
+    update() {
+        this.philosophers.getChildren().forEach(philosopher => {
+            if (philosopher.nameLabel) {
+                let labelX = philosopher.x;
+                const labelWidth = philosopher.nameLabel.width / 2;
+                if (labelX - labelWidth < 0) labelX = labelWidth;
+                else if (labelX + labelWidth > this.physics.world.bounds.width) labelX = this.physics.world.bounds.width - labelWidth;
+                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
+            }
+        });
+        if (this.dialogActive) { this.player.setVelocity(0); this.philosophers.setVelocity(0, 0); if (!this.footstepsSound.isPaused) this.footstepsSound.pause(); return; }
+        const playerSpeed = 200;
+        this.player.setVelocity(0);
+        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
+        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
+        const isMoving = this.player.body.velocity.length() > 0;
+        if (isMoving && this.footstepsSound.isPaused) this.footstepsSound.resume();
+        else if (!isMoving && !this.footstepsSound.isPaused) this.footstepsSound.pause();
+        let canInteractWith = null;
+        for (const philosopher of this.philosophers.getChildren()) {
+            if (Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y) < 100) {
+                canInteractWith = philosopher;
+                break;
+            }
+        }
+        this.events.emit('interactionUpdate', canInteractWith);
+        if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) { this.dialogActive = true; this.events.emit('startDialog', canInteractWith.name); }
+    }
 }
