@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Paideia - Alla Scuola di Atene</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="plugins/rexvirtualjoystickplugin.min.js"></script> 
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +47,9 @@
             });
             this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
+            // --- CARICAMENTO DEL PLUGIN QUI ---
+            this.load.plugin('rexVirtualJoystick', 'plugins/rexvirtualjoystickplugin.min.js', true);
+
             // Immagini
             this.load.image('game_bg', 'assets/img/Game_Background.jpg');
             this.load.video('menu_bg_video', 'assets/video/menu_background.mp4', 'loadeddata', false, true);
@@ -82,14 +84,8 @@
             default: 'arcade',
             arcade: { gravity: { y: 0 }, debug: false }
         },
-        // --- NUOVA CONFIGURAZIONE DEL PLUGIN ---
-        plugins: {
-            scene: [{
-                key: 'rexVirtualJoystick',
-                plugin: VirtualJoystickPlugin, // Riferimento diretto alla classe del plugin
-                start: true
-            }]
-        },
+        // --- NESSUNA CONFIGURAZIONE DEL PLUGIN QUI ---
+        // Verrà caricato tramite la Preloader Scene
         scene: [Preloader, TitleScene, IntroScene, GameScene, UIScene, VictoryScene, CreditsScene]
     };
     const game = new Phaser.Game(config);
