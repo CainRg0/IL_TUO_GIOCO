@@ -12,12 +12,12 @@
     </style>
 </head>
 <body>
-    <script src="scenes/UIScene.js?v=FINAL"></script>
-    <script src="scenes/GameScene.js?v=FINAL"></script>
-    <script src="scenes/TitleScene.js?v=FINAL"></script>
-    <script src="scenes/CreditsScene.js?v=FINAL"></script>
-    <script src="scenes/IntroScene.js?v=FINAL"></script>
-    <script src="scenes/VictoryScene.js?v=FINAL"></script>
+    <script src="scenes/UIScene.js?v=FINAL_FIX"></script>
+    <script src="scenes/GameScene.js?v=FINAL_FIX"></script>
+    <script src="scenes/TitleScene.js?v=FINAL_FIX"></script>
+    <script src="scenes/CreditsScene.js?v=FINAL_FIX"></script>
+    <script src="scenes/IntroScene.js?v=FINAL_FIX"></script>
+    <script src="scenes/VictoryScene.js?v=FINAL_FIX"></script>
 
     <script>
     class Preloader extends Phaser.Scene {
@@ -34,7 +34,6 @@
             });
             this.add.text(400, 240, 'Caricamento...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
-            // Video e Immagini
             this.load.video('menu_bg_video', 'assets/video/menu_background.mp4', 'loadeddata', false, true);
             this.load.image('platone', 'assets/img/platone.png');
             this.load.image('aristotele', 'assets/img/aristotele.png');
@@ -44,7 +43,6 @@
             this.load.image('pitagora', 'assets/img/pitagora.png');
             this.load.image('scuola_di_atene', 'assets/img/scuola_di_atene.jpg');
             
-            // Audio (con i nomi originali che preferisci)
             this.load.audio('bgm', 'assets/audio/The_Introvert.mp3'); 
             this.load.audio('menu_music', 'assets/audio/On_The_Heavens.mp3');
             this.load.audio('credits_music', 'assets/audio/Refuge_Of_The_Survivors.mp3');
