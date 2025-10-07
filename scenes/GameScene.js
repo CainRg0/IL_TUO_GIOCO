@@ -4,10 +4,9 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Add the background image
         this.add.image(400, 300, 'game_bg').setDepth(-1);
-
-        // --- INVISIBLE WALLS --- (Questi non c'erano nel codice che mi hai dato l'ultima volta, ma sono importanti per i bordi del mondo. Li ho reinseriti.)
+        
+        // --- INVISIBLE WALLS --- (Per contenere player e filosofi)
         const walls = this.physics.add.staticGroup();
         walls.create(400, 80).setSize(800, 160).setVisible(false);
         walls.create(80, 300).setSize(160, 600).setVisible(false);
@@ -16,18 +15,17 @@ class GameScene extends Phaser.Scene {
         
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        // Player starts at the bottom center
-        this.player = this.physics.add.sprite(400, 550, 'player'); // Modificato per la posizione in basso al centro
+        this.player = this.physics.add.sprite(400, 550, 'player'); // Giocatore al centro in basso
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
-        this.physics.add.collider(this.player, walls); // Player collides with invisible walls
+        this.physics.add.collider(this.player, walls);
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
         });
 
         const philosopherData = [
-            { key: 'platone', x: 200, y: 180, scale: 0.2 }, // Posizioni aggiustate
+            { key: 'platone', x: 200, y: 180, scale: 0.2 },
             { key: 'aristotele', x: 600, y: 180, scale: 0.2 },
             { key: 'diogene', x: 400, y: 200, scale: 0.2 },
             { key: 'socrate', x: 150, y: 400, scale: 0.2 },
@@ -41,7 +39,7 @@ class GameScene extends Phaser.Scene {
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
-            this.physics.add.collider(philosopher, walls); // Philosophers collide with invisible walls
+            this.physics.add.collider(philosopher, walls);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -53,6 +51,17 @@ class GameScene extends Phaser.Scene {
             }).setOrigin(0.5);
             
             philosopher.nameLabel = label;
+
+            // --- FUNZIONE DI INTERAZIONE TRAMITE CLIC SUL FILOSOFO ---
+            philosopher.setInteractive({ useHandCursor: true }); 
+            philosopher.on('pointerdown', () => {
+                const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
+                // Avvia il dialogo solo se il giocatore è vicino E nessun dialogo è attivo
+                if (distance < 100 && !this.dialogActive) {
+                    this.dialogActive = true; // Blocca il movimento del gioco
+                    this.events.emit('startDialog', philosopher.name);
+                }
+            });
         });
         
         this.physics.add.collider(this.player, this.philosophers);
@@ -60,6 +69,9 @@ class GameScene extends Phaser.Scene {
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+        // --- Variabile di stato per il dialogo, gestita tra GameScene e UIScene ---
+        this.dialogActive = false; 
 
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
@@ -75,10 +87,16 @@ class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        // --- ASCOLTA L'EVENTO DI FINE DIALOGO DALLA UISCENE ---
+        // Questo sblocca il movimento del giocatore e dei filosofi
+        this.events.on('endDialog', () => {
+            this.dialogActive = false; 
+        });
     }
 
     movePhilosophers() {
-        if (this.dialogActive) return;
+        if (this.dialogActive) return; // I filosofi si fermano se il dialogo è attivo
         const speed = 30;
         this.philosophers.getChildren().forEach(philosopher => {
             const randNumber = Phaser.Math.Between(0, 5);
@@ -93,6 +111,14 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
+        // --- BLOCCO DEL GIOCO SE IL DIALOGO E' ATTIVO ---
+        if (this.dialogActive) {
+            this.player.setVelocity(0); 
+            this.philosophers.setVelocity(0, 0); 
+            if (!this.footstepsSound.isPaused) this.footstepsSound.pause(); 
+            return; // Interrompe l'update per non muovere nulla
+        }
+
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
                 let labelX = philosopher.x;
@@ -102,49 +128,4 @@ class GameScene extends Phaser.Scene {
                 } else if (labelX + labelWidth > this.physics.world.bounds.width) {
                     labelX = this.physics.world.bounds.width - labelWidth;
                 }
-                philosopher.nameLabel.setPosition(labelX, philosopher.y - 45);
-            }
-        });
-
-        if (this.dialogActive) {
-            this.player.setVelocity(0);
-            this.philosophers.setVelocity(0, 0);
-            if (!this.footstepsSound.isPaused) {
-                this.footstepsSound.pause();
-            }
-            return;
-        }
-
-        const playerSpeed = 200;
-        this.player.setVelocity(0);
-
-        if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
-        else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
-        if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
-
-        const isMoving = this.player.body.velocity.length() > 0;
-        if (isMoving && this.footstepsSound.isPaused) {
-            this.footstepsSound.resume();
-        } 
-        else if (!isMoving && !this.footstepsSound.isPaused) {
-            this.footstepsSound.pause();
-        }
-
-        let canInteractWith = null;
-        for (const philosopher of this.philosophers.getChildren()) {
-            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
-            if (distance < 100) {
-                canInteractWith = philosopher;
-                break;
-            }
-        }
-        
-        this.events.emit('interactionUpdate', canInteractWith);
-
-        if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-            this.dialogActive = true;
-            this.events.emit('startDialog', canInteractWith.name);
-        }
-    }
-}
+                philosopher.nameLabel.setPosition(labelX
