@@ -7,8 +7,6 @@ class GameScene extends Phaser.Scene {
         this.add.image(400, 300, 'game_bg').setDepth(-1);
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        // --- POSIZIONE DEL GIOCATORE MODIFICATA ---
-        // x: 400 (centro orizzontale), y: 550 (in basso)
         this.player = this.physics.add.sprite(400, 550, 'player');
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
@@ -17,7 +15,6 @@ class GameScene extends Phaser.Scene {
             collideWorldBounds: true,
         });
 
-        // Posizioni dei filosofi leggermente aggiustate
         const philosopherData = [
             { key: 'platone', x: 200, y: 180, scale: 0.2 },
             { key: 'aristotele', x: 600, y: 180, scale: 0.2 },
@@ -44,6 +41,17 @@ class GameScene extends Phaser.Scene {
             }).setOrigin(0.5);
             
             philosopher.nameLabel = label;
+
+            // --- NUOVO: Rendi il filosofo interattivo al clic ---
+            philosopher.setInteractive({ useHandCursor: true }); // Cambia il cursore in una mano
+            philosopher.on('pointerdown', () => {
+                // Avvia il dialogo solo se il giocatore è abbastanza vicino E non c'è già un dialogo attivo
+                const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
+                if (distance < 100 && !this.dialogActive) {
+                    this.dialogActive = true;
+                    this.events.emit('startDialog', philosopher.name);
+                }
+            });
         });
         
         this.physics.add.collider(this.player, this.philosophers);
