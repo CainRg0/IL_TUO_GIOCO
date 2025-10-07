@@ -1,6 +1,5 @@
 class IntroScene extends Phaser.Scene {
     constructor() { super('IntroScene'); }
-
     create() {
         this.cameras.main.setBackgroundColor('#000000');
         this.cameras.main.fadeIn(500);
@@ -10,7 +9,6 @@ class IntroScene extends Phaser.Scene {
         const introText = 'Benvenuto, giovane pensatore.\n\nIl tuo viaggio nella conoscenza sta per iniziare. Esplora questo luogo e parla con i grandi maestri del passato. Supera le loro prove per dimostrare la tua saggezza.\n\n(Clicca per continuare)';
         this.typewriteText(introText);
     }
-
     typewriteText(text) {
         const length = text.length;
         let i = 0;
