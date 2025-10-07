@@ -1,19 +1,31 @@
 class GameScene extends Phaser.Scene {
-    constructor() { super('GameScene'); }
+    constructor() {
+        super('GameScene');
+    }
 
     create() {
-        // Aggiunge l'immagine di sfondo
         this.add.image(400, 300, 'game_bg').setDepth(-1);
 
+        const walls = this.physics.add.staticGroup();
+        walls.create(400, 80).setSize(800, 160).setVisible(false);
+        walls.create(80, 300).setSize(160, 600).setVisible(false);
+        walls.create(720, 300).setSize(160, 600).setVisible(false);
+        walls.create(400, 580).setSize(800, 40).setVisible(false);
+        
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        this.player = this.physics.add.sprite(100, 300, 'player');
+        this.player = this.physics.add.sprite(400, 500, 'player');
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
+        this.physics.add.collider(this.player, walls);
 
         this.philosophers = this.physics.add.group({
             collideWorldBounds: true,
+            // --- MODIFICA 1: Aggiunto un leggero rimbalzo per collisioni più naturali ---
+            bounceX: 0.5,
+            bounceY: 0.5
         });
+
         const philosopherData = [
             { key: 'platone', x: 250, y: 250, scale: 0.2 },
             { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
@@ -28,7 +40,10 @@ class GameScene extends Phaser.Scene {
                 .setName(data.key);
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
-            philosopher.body.setImmovable(true);
+            // Non più immobili, così possono respingersi a vicenda
+            // philosopher.body.setImmovable(true); 
+
+            this.physics.add.collider(philosopher, walls);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -43,6 +58,8 @@ class GameScene extends Phaser.Scene {
         });
         
         this.physics.add.collider(this.player, this.philosophers);
+        
+        // --- MODIFICA 2: Aggiunta la collisione tra i filosofi stessi ---
         this.physics.add.collider(this.philosophers, this.philosophers);
         
         this.cursors = this.input.keyboard.createCursorKeys();
