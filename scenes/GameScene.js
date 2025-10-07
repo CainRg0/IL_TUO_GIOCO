@@ -4,25 +4,19 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        // Aggiunge l'immagine di sfondo
         this.add.image(400, 300, 'game_bg').setDepth(-1);
 
-        const walls = this.physics.add.staticGroup();
-        walls.create(400, 80).setSize(800, 160).setVisible(false);
-        walls.create(80, 300).setSize(160, 600).setVisible(false);
-        walls.create(720, 300).setSize(160, 600).setVisible(false);
-        walls.create(400, 580).setSize(800, 40).setVisible(false);
-        
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        this.player = this.physics.add.sprite(400, 500, 'player');
+        this.player = this.physics.add.sprite(100, 300, 'player');
+        // --- MODIFICATO: Il giocatore si scontra con i bordi del mondo di gioco ---
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
-        this.physics.add.collider(this.player, walls);
 
         this.philosophers = this.physics.add.group({
+            // --- MODIFICATO: Anche i filosofi si scontrano con i bordi del mondo ---
             collideWorldBounds: true,
-            bounceX: 0.5,
-            bounceY: 0.5
         });
 
         const philosopherData = [
@@ -39,12 +33,7 @@ class GameScene extends Phaser.Scene {
                 .setName(data.key);
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
-
-            // --- CORREZIONE APPLICATA QUI ---
-            // REINSERITO: Rende il filosofo non spingibile dal giocatore, ma gli permette di scontrarsi con gli altri.
-            philosopher.body.setImmovable(true); 
-
-            this.physics.add.collider(philosopher, walls);
+            philosopher.body.setImmovable(true);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -58,6 +47,7 @@ class GameScene extends Phaser.Scene {
             philosopher.nameLabel = label;
         });
         
+        // La collisione con i muri invisibili è stata rimossa
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers);
         
