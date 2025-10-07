@@ -5,12 +5,11 @@ class UIScene extends Phaser.Scene {
 
     create() {
         this.gameScene = this.scene.get('GameScene'); // Ottieni un riferimento alla GameScene
-        this.gameScene.dialogActive = false; // Inizializza lo stato del dialogo nella GameScene
 
         // Testo per lo stato del gioco (es. "Filosofi trovati: 0/5")
         this.statusText = this.add.text(20, 20, '', { 
             fontSize: '18px', 
-            fill: '#000000', 
+            fill: '#000000', // Colore nero
             fontStyle: 'bold', 
             fontFamily: '"Cinzel", serif' 
         });
@@ -47,11 +46,10 @@ class UIScene extends Phaser.Scene {
             fontFamily: '"Cinzel", serif' 
         }).setOrigin(1, 1).setInteractive({ useHandCursor: true }).setVisible(false);
 
-        // Eventi del pulsante per cambio colore al passaggio del mouse
         this.dialogButton.on('pointerover', () => this.dialogButton.setStyle({ fill: '#ffff99' }));
         this.dialogButton.on('pointerout', () => this.dialogButton.setStyle({ fill: '#ffffff' }));
 
-        // Dati dei quiz
+        // Dati dei quiz (una sola domanda per filosofo)
         this.quizData = {
             platone: {
                 question: "Platone: Qual è l'essenza della realtà?",
@@ -85,19 +83,19 @@ class UIScene extends Phaser.Scene {
             }
         };
 
-        // Stato del gioco
+        // Stato del gioco (locale alla UIScene)
         this.gameState = { 
-            completed: [], // Filosofi con cui si è già interagito
+            completed: [], 
             score: 0 
         };
-        this.currentPhilosopher = null; // Il filosofo con cui si sta interagendo
-        this.dialogState = 'dialog'; // 'dialog', 'quiz', 'result', 'end'
+        this.currentPhilosopher = null; 
+        this.dialogState = 'dialog'; 
 
         this.updateStatusText();
 
         // Eventi dalla GameScene
         this.gameScene.events.on('interactionUpdate', (philosopher) => {
-            // Mostra/nascondi il testo di interazione solo se non c'è un dialogo attivo
+            // Mostra/nascondi il testo di interazione solo se il gioco non è bloccato e il filosofo non è già completato
             if (!this.gameScene.dialogActive && philosopher && !this.gameState.completed.includes(philosopher.name)) { 
                 this.interactionText.setPosition(philosopher.x, philosopher.y - 50).setVisible(true); 
             } else { 
@@ -105,7 +103,8 @@ class UIScene extends Phaser.Scene {
             }
         });
         this.gameScene.events.on('startDialog', (philosopherName) => { 
-            if (!this.gameScene.dialogActive) { // Evita dialoghi multipli
+            // Inizia il dialogo solo se la GameScene non ha ancora bloccato il gioco
+            if (!this.gameScene.dialogActive) { 
                 this.startDialog(philosopherName); 
             }
         });
@@ -116,16 +115,15 @@ class UIScene extends Phaser.Scene {
     }
 
     startDialog(philosopherName) {
-        this.gameScene.dialogActive = true; // Blocca il movimento del giocatore
+        // La GameScene ha già impostato dialogActive = true
         this.currentPhilosopher = philosopherName;
         this.dialogState = 'dialog';
 
         this.dialogBox.setVisible(true);
         this.dialogText.setVisible(true);
-        this.dialogButton.setVisible(true).setText('Continua'); // Reset testo del pulsante
-        this.interactionText.setVisible(false); // Nascondi il testo "[E] Parla"
+        this.dialogButton.setVisible(true).setText('Continua'); 
+        this.interactionText.setVisible(false); 
 
-        // Rimuovi eventuali risposte quiz precedenti
         if (this.optionsButtons) {
             this.optionsButtons.forEach(btn => btn.destroy());
             this.optionsButtons = null;
@@ -134,20 +132,15 @@ class UIScene extends Phaser.Scene {
         const initialDialog = `Ciao! Sono ${philosopherName}. Sei pronto a mettere alla prova la tua saggezza?`;
         this.typewriteText(initialDialog);
 
-        this.dialogButton.off('pointerdown'); // Rimuovi listener precedenti
+        this.dialogButton.off('pointerdown'); 
         this.dialogButton.on('pointerdown', () => this.nextDialog());
     }
 
     nextDialog() {
         if (this.dialogState === 'dialog') {
             this.showQuiz();
-        } else if (this.dialogState === 'quiz') {
-            // Questo non dovrebbe essere chiamato, le risposte gestiscono lo stato quiz
         } else if (this.dialogState === 'result') {
-            this.endDialog();
-        } else if (this.dialogState === 'end') {
-            // Fine del dialogo, chiudi tutto
-            this.endDialog();
+            this.endDialog(); // Se è il risultato, cliccando "Continua" si chiude
         }
     }
 
@@ -173,21 +166,20 @@ class UIScene extends Phaser.Scene {
             optionBtn.on('pointerout', () => optionBtn.setStyle({ fill: '#ffffff', backgroundColor: '#1a1a1a' }));
             optionBtn.on('pointerdown', () => this.checkAnswer(option, quiz.correct, quiz.dialog));
             this.optionsButtons.push(optionBtn);
-            yOffset += optionBtn.height + 5; // Spazio tra le opzioni
+            yOffset += optionBtn.height + 5; 
         });
     }
 
     checkAnswer(selectedOption, correctAnswer, dialogOnCorrect) {
         this.dialogState = 'result';
-        // Disabilita tutti i pulsanti delle opzioni
         this.optionsButtons.forEach(btn => {
             btn.disableInteractive();
-            btn.setStyle({ fill: '#888888', backgroundColor: '#1a1a1a' }); // Colore grigio
+            btn.setStyle({ fill: '#888888', backgroundColor: '#1a1a1a' }); 
         });
 
-        this.dialogButton.setVisible(true).setText('Continua'); // Mostra pulsante continua
+        this.dialogButton.setVisible(true).setText('Continua'); 
         this.dialogButton.off('pointerdown');
-        this.dialogButton.on('pointerdown', () => this.endDialog());
+        this.dialogButton.on('pointerdown', () => this.endDialog()); // Al clic, chiudi il dialogo
 
         if (selectedOption === correctAnswer) {
             this.gameState.score++;
@@ -217,8 +209,9 @@ class UIScene extends Phaser.Scene {
         }
 
         this.currentPhilosopher = null;
-        this.gameScene.dialogActive = false; // Sblocca il movimento del giocatore
-        this.dialogState = 'end'; // Reset dello stato del dialogo
+        // --- EMETTI L'EVENTO PER SBLOCCARE LA GAMESCENE ---
+        this.gameScene.events.emit('endDialog'); 
+        this.dialogState = 'end'; 
 
         if (this.gameState.completed.length === 5) {
             this.time.delayedCall(500, () => {
@@ -232,13 +225,17 @@ class UIScene extends Phaser.Scene {
     typewriteText(text) {
         this.dialogText.setText('');
         let i = 0;
-        this.time.addEvent({
+        // Interrompi scritture precedenti se ne inizia una nuova
+        if (this._typewritingEvent) {
+            this._typewritingEvent.remove();
+        }
+        this._typewritingEvent = this.time.addEvent({
             callback: () => {
                 this.dialogText.setText(text.substring(0, i));
                 i++;
             },
             repeat: text.length - 1,
-            delay: 30, // Velocità di scrittura
+            delay: 30, 
             callbackScope: this
         });
     }
