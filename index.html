@@ -5,6 +5,7 @@
     <title>Paideia - Alla Scuola di Atene</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script src="plugins/rexvirtualjoystickplugin.min.js"></script> 
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
@@ -81,11 +82,11 @@
             default: 'arcade',
             arcade: { gravity: { y: 0 }, debug: false }
         },
-        // --- CONFIGURAZIONE DEL PLUGIN CORRETTA ---
+        // --- NUOVA CONFIGURAZIONE DEL PLUGIN ---
         plugins: {
             scene: [{
                 key: 'rexVirtualJoystick',
-                plugin: window.RexPlugins.Input.VirtualJoystick, // Usiamo window.RexPlugins per accedere alla variabile globale
+                plugin: VirtualJoystickPlugin, // Riferimento diretto alla classe del plugin
                 start: true
             }]
         },
