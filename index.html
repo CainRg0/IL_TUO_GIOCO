@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Paideia - Alla Scuola di Atene</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="plugins/rexvirtualjoystickplugin.min.js"></script>
+    <script src="plugins/rexvirtualjoystickplugin.min.js"></script> 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
@@ -16,10 +16,8 @@
             height: 100vh; 
             margin: 0; 
             background: #000; 
-            /* Rimuove i margini per i dispositivi mobili, evita barre di scorrimento */
             overflow: hidden; 
         }
-        /* Assicura che l'area di gioco si adatti correttamente sui browser mobili */
         canvas {
             touch-action: none;
             -ms-touch-action: none;
@@ -78,17 +76,16 @@
         scale: {
             mode: Phaser.Scale.RESIZE, // Il gioco si adatta alla dimensione del browser
             autoCenter: Phaser.Scale.CENTER_BOTH,
-            // Non specifichiamo width/height qui, le scene useranno la dimensione attuale
         },
         physics: {
             default: 'arcade',
             arcade: { gravity: { y: 0 }, debug: false }
         },
-        // Aggiungiamo il plugin del joystick qui
+        // --- CONFIGURAZIONE DEL PLUGIN CORRETTA ---
         plugins: {
             scene: [{
                 key: 'rexVirtualJoystick',
-                plugin: RexPlugins.Input.VirtualJoystick,
+                plugin: window.RexPlugins.Input.VirtualJoystick, // Usiamo window.RexPlugins per accedere alla variabile globale
                 start: true
             }]
         },
@@ -96,8 +93,7 @@
     };
     const game = new Phaser.Game(config);
 
-    // Variabile globale per rilevare i dispositivi touch
-    // Questa variabile verrà usata nelle scene per decidere se mostrare il joystick e i pulsanti touch.
+    // Variabile globale per rilevare se è un dispositivo touch (mobile)
     game.isMobile = false;
     if (Phaser.Input.Touch.Device.touch) {
         game.isMobile = true;
