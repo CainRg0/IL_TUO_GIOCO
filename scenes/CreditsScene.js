@@ -45,14 +45,14 @@ class CreditsScene extends Phaser.Scene {
             currentY += lineSpacing;
         });
 
-        // Animazione (tween) di scorrimento completo
+        // --- LOGICA DI SCORRIMENTO CORRETTA ---
         this.tweens.add({
             targets: creditsContainer,
-            y: -creditsContainer.height, // Scorre fino alla fine del contenitore
-            duration: 40000, // Durata di 40 secondi, puoi modificarla se vuoi
+            y: -creditsContainer.height, // Fa scorrere l'intero contenitore fino a farlo uscire in alto
+            duration: 30000, // Durata di 30 secondi
             ease: 'Linear',
             
-            // Alla fine dello scorrimento, mostra il pulsante per tornare al menu
+            // onComplete si attiva SOLO quando l'animazione è veramente finita
             onComplete: () => {
                 const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
                     fontSize: '24px',
