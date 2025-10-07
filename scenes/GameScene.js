@@ -1,44 +1,33 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
-        this.isPlayerBlocked = false; // Manteniamo la variabile di blocco dialogo
+        this.isPlayerBlocked = false; // Controlla se il player è bloccato dal dialogo
     }
 
     create() {
         this.add.image(400, 300, 'game_bg').setDepth(-1);
         
-        // --- LA SOLUZIONE DEFINITIVA PER LE BARRIERE ---
-        // Impostiamo i limiti del mondo fisico per coincidere con l'area calpestabile della tua foto.
-        // Questi limiti bloccheranno sia il player che i filosofi.
-        // Dallo screenshot, l'area calpestabile interna sembra iniziare circa a x=170 e finire a x=630.
-        // L'area superiore sembra iniziare a y=180 e finire a y=530.
-        const worldBoundsX = 170; // Inizio X dell'area giocabile
-        const worldBoundsY = 180; // Inizio Y dell'area giocabile
-        const worldBoundsWidth = 630 - 170; // Larghezza dell'area giocabile (630 è il limite destro)
-        const worldBoundsHeight = 530 - 180; // Altezza dell'area giocabile (530 è il limite inferiore)
+        // --- Barriere del mondo fisico per Player e Filosofi ---
+        const worldBoundsX = 170; 
+        const worldBoundsY = 180; 
+        const worldBoundsWidth = 630 - 170; 
+        const worldBoundsHeight = 530 - 180; 
 
         this.physics.world.setBounds(worldBoundsX, worldBoundsY, worldBoundsWidth, worldBoundsHeight);
 
-        // Rimuoviamo completamente la creazione di 'walls' statiche:
-        // const walls = this.physics.add.staticGroup();
-        // ... e tutti i walls.create(...)
-
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
-        // Posizione iniziale del player leggermente più al centro dell'area giocabile
+        // Player setup
         this.player = this.physics.add.sprite(400, 400, 'player'); 
         this.player.setScale(0.1);
-        
-        // --- IL PLAYER ORA COLLIDE CON I world.bounds ---
-        this.player.setCollideWorldBounds(true); 
+        this.player.setCollideWorldBounds(true); // Il player collide con i world.bounds
 
+        // Filosofi setup
         this.philosophers = this.physics.add.group({
-            // --- ANCHE I FILOSOFI ORA COLLIDONO CON I world.bounds ---
-            collideWorldBounds: true,
+            collideWorldBounds: true, // I filosofi collidono anche con i world.bounds
         });
 
         const philosopherData = [
-            // Posizioni iniziali leggermente riadattate per stare all'interno dei nuovi bounds
             { key: 'platone', x: 250, y: 250, scale: 0.2 },
             { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
             { key: 'diogene', x: 400, y: 280, scale: 0.2 },
@@ -49,12 +38,10 @@ class GameScene extends Phaser.Scene {
         philosopherData.forEach(data => {
             const philosopher = this.philosophers.create(data.x, data.y, data.key)
                 .setScale(data.scale)
-                .setName(data.key);
+                .setName(data.key); // Assicurati che il nome sia impostato correttamente
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
             philosopher.body.setImmovable(true);
-            // Non c'è più bisogno di collisioni con 'walls' o altri gruppi statici.
-            // La collisione con i world.bounds è già gestita dal gruppo.
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -68,20 +55,25 @@ class GameScene extends Phaser.Scene {
             philosopher.nameLabel = label;
         });
         
+        // Collisioni tra player e filosofi, e tra filosofi
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers); 
         
+        // Controlli da tastiera
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.interactKey = this.input.keyboard.add.key(Phaser.Input.Keyboard.KeyCodes.E);
+        this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
+        // Musica di sottofondo
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
         }
 
+        // Suoni passi
         this.footstepsSound = this.sound.add('footsteps', { loop: true, volume: 0.3 });
         this.footstepsSound.play();
         this.footstepsSound.pause();
 
+        // Evento per il movimento dei filosofi
         this.time.addEvent({
             delay: 3000,
             callback: this.movePhilosophers,
@@ -89,7 +81,7 @@ class GameScene extends Phaser.Scene {
             loop: true
         });
 
-        // Evento per la fine del dialogo, per sbloccare il player e riprendere il movimento
+        // Evento per la fine del dialogo, sblocca il player e riprende il movimento
         this.events.on('endDialog', () => {
             this.isPlayerBlocked = false; 
             this.philosophers.getChildren().forEach(p => p.setVelocity(0)); 
@@ -98,11 +90,15 @@ class GameScene extends Phaser.Scene {
     }
 
     movePhilosophers() {
-        if (this.isPlayerBlocked) return; // Se il dialogo è attivo, i filosofi si fermano
+        // I filosofi si muovono solo se il player non è in dialogo
+        if (this.isPlayerBlocked) return; 
+
         const speed = 30;
         this.philosophers.getChildren().forEach(philosopher => {
-            // Se il filosofo è in dialogo, deve rimanere fermo
-            if (this.scene.get('UIScene').currentPhilosopher === philosopher.name) {
+            // Controlla se il filosofo corrente è quello con cui il player sta parlando
+            // per evitare che si muova durante il dialogo.
+            // Questo ora usa this.scene.get('UIScene').currentPhilosopher
+            if (this.scene.isActive('UIScene') && this.scene.get('UIScene').currentPhilosopher === philosopher.name) {
                 philosopher.setVelocity(0, 0); 
                 return; 
             }
@@ -121,7 +117,8 @@ class GameScene extends Phaser.Scene {
         const playerSpeed = 200;
         this.player.setVelocity(0);
 
-        if (!this.isPlayerBlocked) { // Muovi il player solo se non è bloccato dal dialogo
+        // Muovi il player solo se non è bloccato dal dialogo
+        if (!this.isPlayerBlocked) { 
             if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
             else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
             if (this.cursors.up.isDown) this.player.setVelocityY(-playerSpeed);
@@ -130,6 +127,7 @@ class GameScene extends Phaser.Scene {
              this.player.setVelocity(0); // Ferma il player se bloccato dal dialogo
         }
 
+        // Gestione suoni passi
         const isMoving = this.player.body.velocity.length() > 0 && !this.isPlayerBlocked;
         if (isMoving && this.footstepsSound.isPaused) {
             this.footstepsSound.resume();
@@ -138,14 +136,14 @@ class GameScene extends Phaser.Scene {
             this.footstepsSound.pause();
         }
 
+        // Aggiorna posizione etichette nomi filosofi
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
-                // Le etichette dei nomi sono ora contenute nei world.bounds perché i filosofi lo sono.
-                // Non c'è più bisogno di logica complessa per agganciare le etichette ai bordi.
                 philosopher.nameLabel.setPosition(philosopher.x, philosopher.y - 45);
             }
         });
 
+        // Logica di interazione con i filosofi
         let canInteractWith = null;
         for (const philosopher of this.philosophers.getChildren()) {
             const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
@@ -157,6 +155,7 @@ class GameScene extends Phaser.Scene {
         
         this.events.emit('interactionUpdate', canInteractWith);
 
+        // Avvia il dialogo se si preme 'E' e c'è un filosofo vicino
         if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey) && !this.isPlayerBlocked) {
             this.isPlayerBlocked = true; // Blocca il player e i filosofi
             this.events.emit('startDialog', canInteractWith.name);
