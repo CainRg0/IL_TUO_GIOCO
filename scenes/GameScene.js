@@ -10,21 +10,20 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
         this.player = this.physics.add.sprite(100, 300, 'player');
-        // --- MODIFICATO: Il giocatore si scontra con i bordi del mondo di gioco ---
         this.player.setCollideWorldBounds(true);
         this.player.setScale(0.1);
 
         this.philosophers = this.physics.add.group({
-            // --- MODIFICATO: Anche i filosofi si scontrano con i bordi del mondo ---
             collideWorldBounds: true,
         });
 
+        // --- POSIZIONI DI PARTENZA ORIGINALI ---
         const philosopherData = [
-            { key: 'platone', x: 250, y: 250, scale: 0.2 },
-            { key: 'aristotele', x: 550, y: 250, scale: 0.2 },
-            { key: 'diogene', x: 400, y: 220, scale: 0.2 },
-            { key: 'socrate', x: 200, y: 400, scale: 0.2 },
-            { key: 'pitagora', x: 600, y: 400, scale: 0.15 }
+            { key: 'platone', x: 150, y: 150, scale: 0.2 },
+            { key: 'aristotele', x: 700, y: 500, scale: 0.2 },
+            { key: 'diogene', x: 650, y: 150, scale: 0.2 },
+            { key: 'socrate', x: 100, y: 500, scale: 0.2 },
+            { key: 'pitagora', x: 400, y: 300, scale: 0.15 }
         ];
 
         philosopherData.forEach(data => {
@@ -33,7 +32,12 @@ class GameScene extends Phaser.Scene {
                 .setName(data.key);
             
             philosopher.body.setCircle(philosopher.width / 2 * 0.8);
+
+            // --- CORREZIONE APPLICATA QUI ---
+            // Rende il filosofo non spingibile dal giocatore
             philosopher.body.setImmovable(true);
+            // Impedisce che vengano spinti via dalle collisioni tra di loro
+            philosopher.body.setPushable(false);
 
             const name = data.key.charAt(0).toUpperCase() + data.key.slice(1);
             const label = this.add.text(philosopher.x, philosopher.y - 45, name, {
@@ -47,7 +51,7 @@ class GameScene extends Phaser.Scene {
             philosopher.nameLabel = label;
         });
         
-        // La collisione con i muri invisibili è stata rimossa
+        // Aggiungiamo le collisioni
         this.physics.add.collider(this.player, this.philosophers);
         this.physics.add.collider(this.philosophers, this.philosophers);
         
