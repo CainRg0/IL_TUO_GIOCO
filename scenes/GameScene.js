@@ -1,8 +1,7 @@
 class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
-        // Non c'è più this.dialogActive qui
-        this.isPlayerBlocked = false; // Nuovo stato per bloccare solo il giocatore
+        this.isPlayerBlocked = false; 
     }
 
     create() {
@@ -53,12 +52,13 @@ class GameScene extends Phaser.Scene {
             
             philosopher.nameLabel = label;
 
+            // --- CORREZIONE: FUNZIONE DI INTERAZIONE TRAMITE CLIC SUL FILOSOFO ---
             philosopher.setInteractive({ useHandCursor: true }); 
-            philosopher.on('pointerdown', () => {
+            philosopher.on('pointerdown', (pointer, localX, localY, event) => {
+                event.stopPropagation(); // Evita che l'evento si propaghi ad altri elementi (es. lo sfondo)
                 const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, philosopher.x, philosopher.y);
-                // Avvia il dialogo solo se il giocatore è vicino E NON sta già parlando
                 if (distance < 100 && !this.isPlayerBlocked) { 
-                    this.isPlayerBlocked = true; // Blocca il movimento del giocatore
+                    this.isPlayerBlocked = true; 
                     this.events.emit('startDialog', philosopher.name);
                 }
             });
@@ -69,6 +69,8 @@ class GameScene extends Phaser.Scene {
         
         this.cursors = this.input.keyboard.createCursorKeys();
         this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+        this.isPlayerBlocked = false; 
 
         if (!this.sound.get('bgm')) {
             this.sound.play('bgm', { loop: true, volume: 0.4 });
@@ -85,25 +87,20 @@ class GameScene extends Phaser.Scene {
             loop: true
         });
 
-        // --- ASCOLTA L'EVENTO DI FINE DIALOGO DALLA UISCENE ---
         this.events.on('endDialog', () => {
-            this.isPlayerBlocked = false; // Sblocca il movimento del giocatore
-            // Reinizia il movimento dei filosofi (se erano stati bloccati individualmente)
+            this.isPlayerBlocked = false; 
             this.philosophers.getChildren().forEach(p => p.setVelocity(0)); 
-            this.movePhilosophers(); // Re-inizializza il movimento casuale
+            this.movePhilosophers(); 
         });
     }
 
     movePhilosophers() {
-        // I filosofi si muovono sempre, a meno che non siano "interagiti"
         const speed = 30;
         this.philosophers.getChildren().forEach(philosopher => {
-            // Controlla se il filosofo corrente è quello con cui si sta parlando
             if (this.scene.get('UIScene').currentPhilosopher === philosopher.name) {
-                philosopher.setVelocity(0, 0); // Lo ferma se è quello con cui si parla
-                return; // Passa al prossimo filosofo
+                philosopher.setVelocity(0, 0); 
+                return; 
             }
-            // Altrimenti, muovi casualmente
             const randNumber = Phaser.Math.Between(0, 5);
             switch (randNumber) {
                 case 0: philosopher.setVelocity(0, -speed); break;
@@ -119,7 +116,6 @@ class GameScene extends Phaser.Scene {
         const playerSpeed = 200;
         this.player.setVelocity(0);
 
-        // --- IL GIOCATORE SI MUOVE SOLO SE NON E' BLOCCATO ---
         if (!this.isPlayerBlocked) {
             if (this.cursors.left.isDown) this.player.setVelocityX(-playerSpeed);
             else if (this.cursors.right.isDown) this.player.setVelocityX(playerSpeed);
@@ -127,7 +123,6 @@ class GameScene extends Phaser.Scene {
             else if (this.cursors.down.isDown) this.player.setVelocityY(playerSpeed);
         }
 
-        // Gestione audio passi (si ferma se il giocatore è fermo o bloccato)
         const isMoving = this.player.body.velocity.length() > 0 && !this.isPlayerBlocked;
         if (isMoving && this.footstepsSound.isPaused) {
             this.footstepsSound.resume();
@@ -136,7 +131,6 @@ class GameScene extends Phaser.Scene {
             this.footstepsSound.pause();
         }
 
-        // Aggiorna posizione label nomi filosofi
         this.philosophers.getChildren().forEach(philosopher => {
             if (philosopher.nameLabel) {
                 let labelX = philosopher.x;
@@ -159,12 +153,10 @@ class GameScene extends Phaser.Scene {
             }
         }
         
-        // Emette l'evento per la UIScene per mostrare il testo [E] Parla (solo se il giocatore non è bloccato)
         this.events.emit('interactionUpdate', canInteractWith);
 
-        // Se il giocatore è vicino e preme 'E', e NON è già bloccato
         if (canInteractWith && Phaser.Input.Keyboard.JustDown(this.interactKey) && !this.isPlayerBlocked) {
-            this.isPlayerBlocked = true; // Blocca il movimento del giocatore
+            this.isPlayerBlocked = true; 
             this.events.emit('startDialog', canInteractWith.name);
         }
     }
