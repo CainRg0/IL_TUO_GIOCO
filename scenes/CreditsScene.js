@@ -4,107 +4,83 @@ class CreditsScene extends Phaser.Scene {
     }
 
     create() {
-        // Ferma tutta la musica precedente
         this.sound.stopAll();
-        // Riproduci la musica dei crediti
         this.sound.play('credits_music', { loop: true, volume: 0.5 });
+        this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(0.4);
 
-        // --- Sfondo opaco e immagine "scuola_di_atene" ---
-        // Aggiungi un rettangolo nero completamente opaco per coprire la scena precedente.
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 1).setDepth(0);
-
-        // Aggiungi l'immagine 'scuola_di_atene' con la sua opacità naturale.
-        this.add.image(400, 300, 'scuola_di_atene').setScale(0.7).setAlpha(1).setDepth(1);
-        
-        // --- Velatura scura sopra l'immagine per abbassare la luminosità ---
-        // Questo rettangolo nero semitrasparente rende il testo più leggibile.
-        // Puoi cambiare il valore di opacità (ad esempio, 0.6) per scurire o schiarire lo sfondo.
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.6).setDepth(2);
-        
-        const creditsText = [
-            'Paideia',
-            '(Alla scuola di atene)',
-            '',
-            '',
-            'Un Progetto Realizzato Da:',
-            '',
-            '',
-            'Christian Rongo',
-            '[ Game Developer ]',
-            '',
-            'Francesco Maffettone',
-            '[ Concept Creator ]',
-            '',
-            'Pasquale Muriello',
-            '[ Art Designer ]',
-            '',
-            '',
-            '',
-            'Un Ringraziamento Speciale ai Pensatori:',
-            '',
-            'Platone',
-            'Aristotele',
-            'Diogene',
-            'Socrate',
-            'Pitagora',
-            '',
-            '',
-            '',
-            'Hanno partecipato al progetto anche:',
-            '',
-            'Panico Christian',
-            'Valerio D\'Alconzo',
-            'Palladino Gabriele',
-            'Daniele Napolitano',
-            'Fusaro Mario',
-            'Zito Giovanni',
-            'Luca Lombardi',
-            'Manila Signore',
-            'Adriano Gabriele',
-            'Alessandro de Falco',
-            'Testa Daniele',
-            'Davide Sorrentino',
-            'Giuseppe Di Mauro',
-            'Marco Aprea',
-            '',
-            '',
-            '',
-            'Musiche:',
-            '',
-            '"De Caelo / On The Heavens" by Wutering waves, baitian',
-            '"Refuge of the Survivors" by Wutering waves, YUE.STEVEN',
-            '"The Introvert" by Michael Kobrin',
-            '"Preserve The True Colors" by Wutering waves, YUE.STEVEN',
-            '',
-            '',
-            '',
-            'ITI E. BARSANTI - POMIGLIANO D\'ARCO',
-            'Classe 4B',
-            '',
-            '',
+        const creditsTextContent = [
+            'Paideia', '(Alla scuola di atene)', '', '',
+            'Un Progetto Realizzato Da:', '', '',
+            'Christian Rongo', '[ Game Developer ]', '',
+            'Francesco Maffettone', '[ Concept Creator ]', '',
+            'Pasquale Muriello', '[ Art Designer ]', '', '', '',
+            'Un Ringraziamento Speciale ai Pensatori:', '',
+            'Platone', 'Aristotele', 'Diogene', 'Socrate', 'Pitagora', '', '', '',
+            'Hanno partecipato al progetto anche:', '',
+            'Panico Christian', 'Valerio D\'Alconzo', 'Palladino Gabriele', 'Daniele Napolitano',
+            'Fusaro Mario', 'Zito Giovanni', 'Luca Lombardi', 'Manila Signore',
+            'Adriano Gabriele', 'Alessandro de Falco', 'Testa Daniele',
+            'Davide Sorrentino', 'Giuseppe Di Mauro', 'Marco Aprea', '', '', '',
+            'Musiche:', '',
+            '"On The Heavens" by Thoribass',
+            '"Refuge of the Survivors" by Scott Buckley',
+            '"The Introvert" by Michael Kobrin (from Pixabay)', '', '', '',
+            'ITI E. BARSANTI - POMIGLIANO D\'ARCO', 'Classe 4B', '', '',
             'Grazie per aver giocato!',
         ];
 
-        const textObject = this.add.text(400, 600, creditsText, {
-            fontSize: '28px',
-            fill: '#E0D6B3',
-            fontFamily: '"Cinzel", serif',
-            align: 'center',
-            lineSpacing: 15
-        }).setOrigin(0.5, 0).setDepth(3);
+        // Creiamo un "contenitore" che terrà tutte le nostre righe di testo.
+        const creditsContainer = this.add.container(400, 600);
 
+        // Definiamo gli stili per il testo
+        const normalStyle = { fontSize: '28px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        // Stile per il nome evidenziato (leggermente più grande, stesso colore)
+        const highlightStyle = { fontSize: '32px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+        const smallStyle = { fontSize: '20px', fill: '#E0D6B3', fontFamily: '"Cinzel", serif', align: 'center' };
+
+        let currentY = 0;
+        const lineSpacing = 45; // Spazio tra le righe
+
+        // Creiamo ogni riga di testo individualmente
+        creditsTextContent.forEach(line => {
+            let style = normalStyle;
+            // Se la riga è una di quelle da evidenziare, usiamo lo stile speciale
+            if (line === 'Christian Rongo' || line === '[ Game Developer ]') {
+                style = highlightStyle;
+            } else if (line.startsWith('"')) { // Se è un credito musicale
+                style = smallStyle;
+            }
+
+            const textLine = this.add.text(0, currentY, line, style).setOrigin(0.5);
+            creditsContainer.add(textLine); // Aggiungiamo la riga al contenitore
+
+            currentY += lineSpacing; // Passiamo alla riga successiva
+        });
+
+        // Animazione di scorrimento
         this.tweens.add({
-            targets: textObject,
-            y: -textObject.height,
-            duration: 55000,
+            targets: creditsContainer,
+            y: -creditsContainer.height, // Facciamo scorrere il contenitore fino a farlo uscire
+            duration: 45000, // Rallentato a 45 secondi
             ease: 'Linear',
             onComplete: () => {
-                this.time.delayedCall(2000, () => {
+                const restartButton = this.add.text(400, 550, '[ Torna al Menu Principale ]', {
+                    fontSize: '24px',
+                    fill: '#c5a65a',
+                    fontFamily: '"Cinzel", serif'
+                }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+                restartButton.on('pointerover', () => restartButton.setStyle({ fill: '#FFFFFF' }));
+                restartButton.on('pointerout', () => restartButton.setStyle({ fill: '#c5a65a' }));
+
+                restartButton.on('pointerdown', () => {
                     this.sound.stopAll();
-                    this.scene.start('TitleScene');
+                    this.cameras.main.fadeOut(500, 0, 0, 0);
+                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                        this.scene.start('TitleScene');
+                    });
                 });
             }
         });
     }
 }
-
