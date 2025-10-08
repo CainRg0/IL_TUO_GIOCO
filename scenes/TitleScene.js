@@ -64,7 +64,6 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
-    // --- FUNZIONE createLoreScreen CON TITOLO MIGLIORATO ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
@@ -72,15 +71,14 @@ class TitleScene extends Phaser.Scene {
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(999);
         
         // --- TITOLO LORE AGGIORNATO ---
-        const title = this.add.text(400, 30, 'Paideia - Alla Scuola di Atene', { // Posizione Y più in alto, centrato (400)
-            fontSize: '48px', // Dimensione aumentata
-            fill: '#FFD700', // Colore oro
-            fontFamily: '"Cinzel", serif',
-            align: 'center', // Allineamento centrale
-            wordWrap: { width: 700, useAdvancedWrap: true }, // Larghezza per il "tetto", usa advanced wrap
-            stroke: '#000000', // Bordo nero per risaltare
-            strokeThickness: 6
-        }).setOrigin(0.5, 0).setDepth(999); // setOrigin(0.5,0) e setDepth alto
+        const title = this.add.text(400, 30, 'Paideia - Alla Scuola di Atene', {
+            fontSize: '48px',
+            fill: '#E0D6B3', // Colore oro/pergamena
+            fontFamily: '"Cinzel", serif', // Font corretto
+            align: 'center',
+            wordWrap: { width: 700, useAdvancedWrap: true }
+            // Rimosso stroke e strokeThickness
+        }).setOrigin(0.5, 0).setDepth(999);
 
         const loreTextContent = [
             'Opera di Raffaello Sanzio (1509-1511), celebra la conoscenza e la filosofia classica.', '',
@@ -91,7 +89,6 @@ class TitleScene extends Phaser.Scene {
             '• Pitagora: intento a scrivere le sue teorie',
             '• Diogene: il cinico, sdraiato sugli scalini'
         ];
-        // Testo spostato più in basso per lasciare spazio al titolo grande
         const text = this.add.text(570, 150, loreTextContent, { 
             fontSize: '18px', 
             fill: '#000000', 
@@ -99,7 +96,7 @@ class TitleScene extends Phaser.Scene {
             align: 'center', 
             wordWrap: { width: 380 }, 
             lineSpacing: 10 
-        }).setOrigin(0.5, 0).setDepth(999); 
+        }).setOrigin(0.5, 0).setDepth(999);
 
         const closeButton = this.add.text(240, 560, '[ Chiudi ]', { 
             fontSize: '24px', 
