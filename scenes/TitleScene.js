@@ -42,23 +42,21 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
     }
 
-    startGame() {
+    startGame() { 
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.start('IntroScene');
         });
     }
-
-    showCredits() {
+    showCredits() { 
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
             this.scene.start('CreditsScene');
         });
     }
-
-    showVictory() {
+    showVictory() { 
         this.sound.stopAll();
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
@@ -66,25 +64,21 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
-    // --- FUNZIONE createLoreScreen COMPLETAMENTE RISCRITTA ---
+    // --- FUNZIONE createLoreScreen CORRETTA CON setDepth ALTO ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // Sfondo a tinta unita
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
-
-        // Immagine a sinistra
-        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-
-        // Titolo in alto a sinistra
+        // Ogni elemento della lore deve avere un setDepth molto alto per essere in primo piano
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600).setDepth(999);
+        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(999);
+        
         const title = this.add.text(570, 70, 'Paideia - Alla Scuola di Atene', {
             fontSize: '32px',
             fill: '#000000',
             fontFamily: '"Cinzel", serif',
             align: 'center'
-        }).setOrigin(0.5, 0);
+        }).setOrigin(0.5, 0).setDepth(999); // setDepth alto
 
-        // Testo descrittivo a destra, spostato più in basso
         const loreTextContent = [
             'Opera di Raffaello Sanzio (1509-1511), celebra la conoscenza e la filosofia classica.', '',
             'Significato e Personaggi',
@@ -101,33 +95,56 @@ class TitleScene extends Phaser.Scene {
             align: 'center', 
             wordWrap: { width: 380 }, 
             lineSpacing: 10 
-        }).setOrigin(0.5, 0);
+        }).setOrigin(0.5, 0).setDepth(999); // setDepth alto
 
-        // Pulsante per chiudere, spostato a sinistra
         const closeButton = this.add.text(240, 560, '[ Chiudi ]', { 
             fontSize: '24px', 
             fill: '#333', 
             fontFamily: '"Cinzel", serif' 
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(999); // setDepth alto
         
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        // Aggiunge tutti gli elementi al gruppo e lo nasconde
         this.loreGroup.addMultiple([bg, image, title, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
     
     showLore() {
-        // ... (questa funzione non cambia)
+        // Nascondi gli elementi del menu principale
+        this.startButton.setVisible(false);
+        this.loreButton.setVisible(false);
+        this.creditsButton.setVisible(false);
+        
+        // Rendi visibile il gruppo della lore
+        this.loreGroup.setVisible(true);
+
+        if (this.menuMusic.isPlaying) this.menuMusic.pause();
+        if (this.sound.context.state === 'suspended') { this.sound.context.resume(); }
+        this.narratorSound.play();
     }
 
     hideLore() {
-        // ... (questa funzione non cambia)
+        // Nascondi il gruppo della lore
+        this.loreGroup.setVisible(false);
+
+        // Rendi visibili gli elementi del menu principale
+        this.startButton.setVisible(true);
+        this.loreButton.setVisible(true);
+        this.creditsButton.setVisible(true);
+
+        if (this.narratorSound && this.narratorSound.isPlaying) {
+            this.narratorSound.stop();
+        }
+        if (this.menuMusic.isPaused) this.menuMusic.resume();
     }
 
     handleKonamiCode(event) {
-        // ... (questa funzione non cambia)
+        this.inputKeys.push(event.key.toUpperCase());
+        if (this.inputKeys.length > this.konamiCode.length) this.inputKeys.shift();
+        if (this.inputKeys.join('') === this.konamiCode.join('')) {
+            this.showVictory();
+        }
     }
 }
