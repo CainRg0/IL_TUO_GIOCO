@@ -64,20 +64,21 @@ class TitleScene extends Phaser.Scene {
         });
     }
 
-    // --- FUNZIONE createLoreScreen CORRETTA CON setDepth ALTO ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // Ogni elemento della lore deve avere un setDepth molto alto per essere in primo piano
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600).setDepth(999);
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(999);
         
-        const title = this.add.text(570, 70, 'Paideia - Alla Scuola di Atene', {
-            fontSize: '32px',
-            fill: '#000000',
-            fontFamily: '"Cinzel", serif',
-            align: 'center'
-        }).setOrigin(0.5, 0).setDepth(999); // setDepth alto
+        // --- TITOLO LORE AGGIORNATO ---
+        const title = this.add.text(400, 30, 'Paideia - Alla Scuola di Atene', {
+            fontSize: '48px',
+            fill: '#000000', // Colore oro/pergamena
+            fontFamily: '"Cinzel", serif', // Font corretto
+            align: 'center',
+            wordWrap: { width: 700, useAdvancedWrap: true }
+            // Rimosso stroke e strokeThickness
+        }).setOrigin(0.5, 0).setDepth(999);
 
         const loreTextContent = [
             'Opera di Raffaello Sanzio (1509-1511), celebra la conoscenza e la filosofia classica.', '',
@@ -95,13 +96,13 @@ class TitleScene extends Phaser.Scene {
             align: 'center', 
             wordWrap: { width: 380 }, 
             lineSpacing: 10 
-        }).setOrigin(0.5, 0).setDepth(999); // setDepth alto
+        }).setOrigin(0.5, 0).setDepth(999);
 
         const closeButton = this.add.text(240, 560, '[ Chiudi ]', { 
             fontSize: '24px', 
             fill: '#333', 
             fontFamily: '"Cinzel", serif' 
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(999); // setDepth alto
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(999);
         
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
@@ -112,12 +113,10 @@ class TitleScene extends Phaser.Scene {
     }
     
     showLore() {
-        // Nascondi gli elementi del menu principale
         this.startButton.setVisible(false);
         this.loreButton.setVisible(false);
         this.creditsButton.setVisible(false);
         
-        // Rendi visibile il gruppo della lore
         this.loreGroup.setVisible(true);
 
         if (this.menuMusic.isPlaying) this.menuMusic.pause();
@@ -126,10 +125,8 @@ class TitleScene extends Phaser.Scene {
     }
 
     hideLore() {
-        // Nascondi il gruppo della lore
         this.loreGroup.setVisible(false);
 
-        // Rendi visibili gli elementi del menu principale
         this.startButton.setVisible(true);
         this.loreButton.setVisible(true);
         this.creditsButton.setVisible(true);
