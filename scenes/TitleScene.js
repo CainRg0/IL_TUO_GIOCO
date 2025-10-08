@@ -42,41 +42,16 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
     }
 
-    startGame() {
-        this.sound.stopAll();
-        this.cameras.main.fadeOut(500, 0, 0, 0);
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-            this.scene.start('IntroScene');
-        });
-    }
+    startGame() { /* ... non cambia ... */ }
+    showCredits() { /* ... non cambia ... */ }
+    showVictory() { /* ... non cambia ... */ }
 
-    showCredits() {
-        this.sound.stopAll();
-        this.cameras.main.fadeOut(500, 0, 0, 0);
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-            this.scene.start('CreditsScene');
-        });
-    }
-
-    showVictory() {
-        this.sound.stopAll();
-        this.cameras.main.fadeOut(500, 0, 0, 0);
-        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-            this.scene.start('VictoryScene');
-        });
-    }
-
-    // --- FUNZIONE createLoreScreen COMPLETAMENTE RISCRITTA ---
+    // --- FUNZIONE createLoreScreen CORRETTA CON setDepth ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        // Sfondo a tinta unita
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
-
-        // Immagine a sinistra
-        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
-
-        // Testo a destra
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600).setDepth(10);
+        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(10);
         const loreTextContent = [
             'L\'Affresco: La Scuola di Atene', '',
             'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.', '',
@@ -93,20 +68,18 @@ class TitleScene extends Phaser.Scene {
             align: 'center', 
             wordWrap: { width: 380 }, 
             lineSpacing: 10 
-        }).setOrigin(0.5, 0);
+        }).setOrigin(0.5, 0).setDepth(10);
 
-        // Pulsante per chiudere in basso al centro
         const closeButton = this.add.text(400, 560, '[ Chiudi ]', { 
             fontSize: '24px', 
             fill: '#333', 
             fontFamily: '"Cinzel", serif' 
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(10);
         
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        // Aggiunge tutti gli elementi al gruppo e lo nasconde
         this.loreGroup.addMultiple([bg, image, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
