@@ -4,6 +4,7 @@ class IntroScene extends Phaser.Scene {
     }
 
     create() {
+        // Avvia la musica dell'introduzione
         this.sound.play('intro_music', { loop: true, volume: 0.6 });
 
         this.cameras.main.setBackgroundColor('#000000');
@@ -27,7 +28,7 @@ class IntroScene extends Phaser.Scene {
                 this.typewriteText(this.introPart2, () => {
                     // Quando il secondo testo è finito, aspetta un clic per iniziare il gioco
                     this.input.once('pointerdown', () => {
-                        this.sound.stopAll();
+                        this.sound.stopAll(); // Ferma la musica dell'intro
                         this.cameras.main.fadeOut(500, 0, 0, 0);
                         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
                             this.scene.start('GameScene');
