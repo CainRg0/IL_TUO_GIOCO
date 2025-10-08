@@ -42,74 +42,92 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown', this.handleKonamiCode, this);
     }
 
-    startGame() { /* ... non cambia ... */ }
-    showCredits() { /* ... non cambia ... */ }
-    showVictory() { /* ... non cambia ... */ }
+    startGame() {
+        this.sound.stopAll();
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('IntroScene');
+        });
+    }
 
-    // --- FUNZIONE createLoreScreen CORRETTA CON setDepth ---
+    showCredits() {
+        this.sound.stopAll();
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('CreditsScene');
+        });
+    }
+
+    showVictory() {
+        this.sound.stopAll();
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('VictoryScene');
+        });
+    }
+
+    // --- FUNZIONE createLoreScreen COMPLETAMENTE RISCRITTA ---
     createLoreScreen() {
         this.loreGroup = this.add.group();
 
-        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600).setDepth(10);
-        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(10);
+        // Sfondo a tinta unita
+        const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600);
+
+        // Immagine a sinistra
+        const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4);
+
+        // Titolo in alto a sinistra
+        const title = this.add.text(570, 70, 'Paideia - Alla Scuola di Atene', {
+            fontSize: '32px',
+            fill: '#000000',
+            fontFamily: '"Cinzel", serif',
+            align: 'center'
+        }).setOrigin(0.5, 0);
+
+        // Testo descrittivo a destra, spostato più in basso
         const loreTextContent = [
-            'L\'Affresco: La Scuola di Atene', '',
-            'Opera di Raffaello Sanzio (1509-1511) situata nelle Stanze Vaticane, celebra la conoscenza e la filosofia classica, riunendo i più grandi pensatori dell\'antichità.', '',
+            'Opera di Raffaello Sanzio (1509-1511), celebra la conoscenza e la filosofia classica.', '',
             'Significato e Personaggi',
-            'Al centro, Platone punta verso l\'alto (il mondo delle idee), mentre Aristotele indica il basso (il mondo terreno). Nel gioco incontri anche:', 
-            '• Socrate: maestro di Platone, con il profilo schiacciato.',
-            '• Pitagora: in primo piano, intento a scrivere le sue teorie sui numeri.',
-            '• Diogene: il cinico, sdraiato con indifferenza sugli scalini.'
+            'Al centro, Platone punta verso l\'alto (il mondo delle idee), mentre Aristotele indica il basso (il mondo terreno).', '',
+            'Nel gioco incontri:',
+            '• Socrate: maestro di Platone',
+            '• Pitagora: intento a scrivere le sue teorie',
+            '• Diogene: il cinico, sdraiato sugli scalini'
         ];
-        const text = this.add.text(570, 70, loreTextContent, { 
+        const text = this.add.text(570, 150, loreTextContent, { 
             fontSize: '18px', 
             fill: '#000000', 
             fontStyle: 'bold', 
             align: 'center', 
             wordWrap: { width: 380 }, 
             lineSpacing: 10 
-        }).setOrigin(0.5, 0).setDepth(10);
+        }).setOrigin(0.5, 0);
 
-        const closeButton = this.add.text(400, 560, '[ Chiudi ]', { 
+        // Pulsante per chiudere, spostato a sinistra
+        const closeButton = this.add.text(240, 560, '[ Chiudi ]', { 
             fontSize: '24px', 
             fill: '#333', 
             fontFamily: '"Cinzel", serif' 
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(10);
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         
         closeButton.on('pointerover', () => closeButton.setStyle({ fill: '#000' }));
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        this.loreGroup.addMultiple([bg, image, text, closeButton]);
+        // Aggiunge tutti gli elementi al gruppo e lo nasconde
+        this.loreGroup.addMultiple([bg, image, title, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
     
     showLore() {
-        this.startButton.setVisible(false);
-        this.loreButton.setVisible(false);
-        this.creditsButton.setVisible(false);
-        this.loreGroup.setVisible(true);
-        if (this.menuMusic.isPlaying) this.menuMusic.pause();
-        if (this.sound.context.state === 'suspended') { this.sound.context.resume(); }
-        this.narratorSound.play();
+        // ... (questa funzione non cambia)
     }
 
     hideLore() {
-        this.loreGroup.setVisible(false);
-        this.startButton.setVisible(true);
-        this.loreButton.setVisible(true);
-        this.creditsButton.setVisible(true);
-        if (this.narratorSound && this.narratorSound.isPlaying) {
-            this.narratorSound.stop();
-        }
-        if (this.menuMusic.isPaused) this.menuMusic.resume();
+        // ... (questa funzione non cambia)
     }
 
     handleKonamiCode(event) {
-        this.inputKeys.push(event.key.toUpperCase());
-        if (this.inputKeys.length > this.konamiCode.length) this.inputKeys.shift();
-        if (this.inputKeys.join('') === this.konamiCode.join('')) {
-            this.showVictory();
-        }
+        // ... (questa funzione non cambia)
     }
 }
