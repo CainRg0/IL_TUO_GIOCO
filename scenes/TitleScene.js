@@ -70,14 +70,12 @@ class TitleScene extends Phaser.Scene {
         const bg = this.add.graphics().fillStyle(0xE0D6B3, 1).fillRect(0, 0, 800, 600).setDepth(999);
         const image = this.add.image(240, 300, 'scuola_di_atene').setScale(0.4).setDepth(999);
         
-        // --- TITOLO LORE AGGIORNATO ---
         const title = this.add.text(400, 30, 'Paideia - Alla Scuola di Atene', {
             fontSize: '48px',
-            fill: '#E0D6B3', // Colore oro/pergamena
-            fontFamily: '"Cinzel", serif', // Font corretto
-            align: 'center',
+            fill: '#E0D6B3', 
+            fontFamily: '"Cinzel", serif', 
+            align: 'center', 
             wordWrap: { width: 700, useAdvancedWrap: true }
-            // Rimosso stroke e strokeThickness
         }).setOrigin(0.5, 0).setDepth(999);
 
         const loreTextContent = [
@@ -89,9 +87,20 @@ class TitleScene extends Phaser.Scene {
             '• Pitagora: intento a scrivere le sue teorie',
             '• Diogene: il cinico, sdraiato sugli scalini'
         ];
+        
+        // --- NUOVO: Pannello nero semi-trasparente sotto il testo ---
+        // Calcoliamo la posizione e la dimensione del pannello per racchiudere il testo.
+        // La larghezza del testo è 380, il suo centro è 570. Quindi da 570 - 190 a 570 + 190.
+        // La sua Y inizia a 150.
+        const textPanelWidth = 400; // Larghezza leggermente maggiore del testo
+        const textPanelHeight = 350; // Altezza approssimativa per coprire tutto il testo
+        const textPanel = this.add.graphics({ fillStyle: { color: 0x000000, alpha: 0.5 } }) // Nero, 50% trasparenza
+                                  .fillRect(570 - (textPanelWidth / 2), 140, textPanelWidth, textPanelHeight) // Posizione e dimensione
+                                  .setDepth(999); // Stesso depth del testo, ma aggiunto prima per stare sotto
+        
         const text = this.add.text(570, 150, loreTextContent, { 
             fontSize: '18px', 
-            fill: '#000000', 
+            fill: '#E0D6B3', // Ho cambiato il colore del testo a oro per risaltare sul pannello nero
             fontStyle: 'bold', 
             align: 'center', 
             wordWrap: { width: 380 }, 
@@ -108,7 +117,8 @@ class TitleScene extends Phaser.Scene {
         closeButton.on('pointerout', () => closeButton.setStyle({ fill: '#333' }));
         closeButton.on('pointerdown', () => this.hideLore());
 
-        this.loreGroup.addMultiple([bg, image, title, text, closeButton]);
+        // Aggiungi anche il textPanel al gruppo della lore
+        this.loreGroup.addMultiple([bg, image, title, textPanel, text, closeButton]);
         this.loreGroup.setVisible(false);
     }
     
