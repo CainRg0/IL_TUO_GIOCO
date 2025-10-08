@@ -71,9 +71,10 @@ class CreditsScene extends Phaser.Scene {
             '',
             'Musiche:',
             '',
-            '"On The Heavens" by Thoribass',
-            '"Refuge of the Survivors" by Scott Buckley',
-            '"The Introvert" by Michael Kobrin (from Pixabay)',
+            '"De Caelo / On The Heavens" by Wutering waves, baitian',
+            '"Refuge of the Survivors" by Wutering waves, YUE.STEVEN',
+            '"The Introvert" by Michael Kobrin',
+            '"Preserve The True Colors" by Wutering waves, YUE.STEVEN',
             '',
             '',
             '',
@@ -106,3 +107,4 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
