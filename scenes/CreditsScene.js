@@ -108,7 +108,7 @@ class CreditsScene extends Phaser.Scene {
         this.tweens.add({
             targets: container,
             y: -container.height, // Anima l'intero container verso l'alto
-            duration: 55000,
+            duration: 30000,
             ease: 'Linear',
             onComplete: () => {
                 this.time.delayedCall(2000, () => {
@@ -119,3 +119,4 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
