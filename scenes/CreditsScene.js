@@ -50,7 +50,7 @@ class CreditsScene extends Phaser.Scene {
             '',
             '',
             '',
-            'Hanno partecipato al progetto anche:',
+            'Hanno partecipato al progetto:',
             '',
             'Panico Christian',
             'Valerio D\'Alconzo',
@@ -106,4 +106,5 @@ class CreditsScene extends Phaser.Scene {
         });
     }
 }
+
 
